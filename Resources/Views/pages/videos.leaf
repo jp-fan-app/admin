@@ -2,6 +2,6 @@
     #export("title", "Dashboard")
     #export("bodyClass", "")
     #export("body"):
-        <div>Dashboard</div>
+        <div>Videos</div>
     #endexport
 #endextend

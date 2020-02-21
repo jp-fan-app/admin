@@ -1,0 +1,46 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Models</li>
+            </ol>
+        </nav>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Main Image</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #for(model in context.models):
+                    <tr>
+                        <td>
+                            #(model.id)
+                        </td>
+                        <td style="width: 200px;">
+                            <img src="https://car-images.jp-fan-app.de/#(model.mainImageID).jpg" class="rounded img-fluid">
+                        </td>
+                        <td>
+                            <a href="/models/#(model.id)">#(model.name)</a>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/models/#(model.id)/add-stage" class="btn btn-success">Add Stage</a>
+                                <a href="/models/#(models.id)/edit" class="btn btn-primary">Edit</a>
+                                <a href="/models/#(models.id)/delete" class="btn btn-danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    #endfor
+                </tbody>
+            </table>
+            <a href="/manufacturers/#(manufacturer.id)/add-model" class="btn btn-success">New Model</a>
+        </div>
+    #endexport
+#endextend

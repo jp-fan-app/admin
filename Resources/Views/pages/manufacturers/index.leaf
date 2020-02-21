@@ -1,0 +1,42 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Manufacturers</li>
+            </ol>
+        </nav>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #for(manufacturer in context.manufacturers):
+                    <tr>
+                        <td>
+                            #(manufacturer.id)
+                        </td>
+                        <td>
+                            <a href="/manufacturers/#(manufacturer.id)">#(manufacturer.name)</a>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/manufacturers/#(manufacturer.id)/add-model" class="btn btn-success">Add Model</a>
+                                <a href="/manufacturers/#(manufacturer.id)/edit" class="btn btn-primary">Edit</a>
+                                <a href="/manufacturers/#(manufacturer.id)/delete" class="btn btn-danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    #endfor
+                </tbody>
+            </table>
+            <a href="/manufacturers/new" class="btn btn-success">New Manufacturer</a>
+        </div>
+    #endexport
+#endextend

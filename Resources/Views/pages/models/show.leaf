@@ -1,0 +1,82 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item active">#(context.model.name)</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>Stages</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            #for(stage in context.stages):
+                            <tr>
+                                <td>
+                                    #(stage.id)
+                                </td>
+                                <td>
+                                    <a href="/models/#(context.model.id)/stage/#(stage.id)">#(stage.name)</a>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/models/#(model.id)/stage/#(stage.id)/add-timing" class="btn btn-success">Add Timing</a>
+                                        <a href="/models/#(model.id)/stage/#(stage.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(model.id)/stage/#(stage.id)/delete" class="btn btn-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            #endfor
+                        </tbody>
+                    </table>
+                    <a href="/models/#(model.id)/add-stage" class="btn btn-success">New Stage</a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <h2>Images</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Image</th>
+                                <th>URL</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            #for(image in context.images):
+                            <tr>
+                                <td>
+                                    #(image.id)
+                                </td>
+                                <td style="width: 200px;">
+                                    <img src="https://car-images.jp-fan-app.de/#(image.id).jpg" class="rounded img-fluid">
+                                </td>
+                                <td>
+                                    <a href="https://car-images.jp-fan-app.de/#(image.id).jpg">https://car-images.jp-fan-app.de/#(image.id).jpg</a>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                            #endfor
+                        </tbody>
+                    </table>
+                    <a href="/models/#(model.id)/add-image" class="btn btn-success">New Image</a>
+                </div>
+            </div>
+        </div>
+    #endexport
+#endextend

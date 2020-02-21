@@ -1,0 +1,29 @@
+os: linux
+dist: trusty
+language: generic
+sudo: required
+branches:
+  only:
+  - "/^develop\\/.*$/"
+env:
+  global:
+  - LC_CTYPE=en_US.UTF-8
+  - LANG=en_US.UTF-8
+  - DOCKER_IMAGE_NAME=jpfanappadmin:1.0.0
+git:
+  submodules: false
+stages:
+- name: develop
+  if: branch =~ ^develop/.*$
+jobs:
+  include:
+  - stage: develop
+    name: Develop Job
+    before_install:
+    # - tar xvf secrets.tar
+    # - chmod 600 jpfanapp_ci
+    script:
+    - docker build -f Dockerfile --build-arg env=production -t $DOCKER_IMAGE_NAME .
+    - docker save -o jpfanappadmin-image.tar $DOCKER_IMAGE_NAME
+    after_script:
+      # rm jpfanapp_ci

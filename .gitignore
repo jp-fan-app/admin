@@ -1,0 +1,12 @@
+Packages
+.build
+xcuserdata
+*.xcodeproj
+DerivedData/
+.DS_Store
+db.sqlite
+.swiftpm
+.prod.env
+jpfanapp_ci
+jpfanapp_ci.pub
+secrets.tar
