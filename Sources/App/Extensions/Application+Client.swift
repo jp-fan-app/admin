@@ -18,7 +18,12 @@ extension Application {
             return existing
         } else {
             let accessToken = ProcessInfo.processInfo.environment["ACCESS_TOKEN"] ?? ""
-            let newClient = JPFanAppClient.production(accessToken: accessToken)
+            var newClient = JPFanAppClient.production(accessToken: accessToken)
+            if environment == .production {
+                newClient = JPFanAppClient(accessToken: accessToken,
+                                           baseURL: URL(string: "http://api:8080")!,
+                                           carImagesBaseURL: URL(string: "https://car-images.jp-fan-app.de")!)
+            }
             self.storage[ClientKey] = newClient
             return newClient
         }
