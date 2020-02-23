@@ -30,6 +30,6 @@ jobs:
     - scp -i jpfanapp_ci -o StrictHostKeyChecking=no .prod.env root@178.128.203.132:~/.admin.prod.env
     - ssh -i jpfanapp_ci root@178.128.203.132 'docker load -i jpfanappadmin-image.tar && rm jpfanappadmin-image.tar'
     - ssh -i jpfanapp_ci root@178.128.203.132 'docker stop admin || docker rm admin || true'
-    - ssh -i jpfanapp_ci root@178.128.203.132 'docker run -id --restart=always --name admin --env-file ~/.admin.prod.env jpfanappadmin:1.0.0'
+    - ssh -i jpfanapp_ci root@178.128.203.132 'docker run -id --restart=always --name admin --network=jpperformanceserver_default --env-file ~/.admin.prod.env jpfanappadmin:1.0.0'
     after_script:
     - rm jpfanapp_ci
