@@ -21,7 +21,7 @@ final class ModelController {
 
     func index(_ req: Request) throws -> EventLoopFuture<View> {
         return req.client().modelsIndex().flatMap { models in
-            let context = DefaultContext(.models, ModelIndexContext(models: models))
+            let context = DefaultContext(.models, ModelIndexContext(models: models), isAdmin: req.isAdmin())
             return req.view.render("pages/models/index", context)
         }
     }
@@ -42,9 +42,11 @@ final class ModelController {
         return req.client().modelsShow(id: id).flatMap { model in
             req.client().modelsStages(id: id).flatMap { stages in
                 req.client().modelsImages(id: id).flatMap { images in
-                    let context = DefaultContext(.models, ModelShowContext(model: model,
-                                                                           stages: stages,
-                                                                           images: images))
+                    let context = DefaultContext(.models,
+                                                 ModelShowContext(model: model,
+                                                                  stages: stages,
+                                                                  images: images),
+                                                 isAdmin: req.isAdmin())
                     return req.view.render("pages/models/show", context).encodeResponse(for: req)
                 }
             }

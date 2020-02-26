@@ -1,0 +1,37 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/users">Users</a></li>
+                <li class="breadcrumb-item active">New</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center ">
+            <div class="col col-lg-6">
+                <form method="POST">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" aria-describedby="name-help" value="#(context.form.name)">
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" aria-describedby="email-help" value="#(context.form.email)">
+                  </div>
+                  <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" aria-describedby="password-help" value="#(context.form.password)">
+                  </div>
+                  <div class="form-group">
+                    <label for="isAdmin">Is Admin</label>
+                    <input type="checkbox" class="form-control" id="isAdmin" name="isAdmin" aria-describedby="isAdmin-help" value="checked" #if(context.form.isAdmin): checked="checked" #endif>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

@@ -20,6 +20,9 @@ final class AuthMiddleware: Middleware {
             if let authToken = request.headers.cookie["authToken"]?.string, authToken.count > 0 {
                 request.session.data["authToken"] = authToken
             }
+            if let isAdmin = request.headers.cookie["isAdmin"]?.string, isAdmin.count > 0 {
+                request.session.data["isAdmin"] = isAdmin
+            }
         }
 
         guard request.session.data["authToken"] != nil else {

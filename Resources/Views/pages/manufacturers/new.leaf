@@ -1,0 +1,26 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/manufacturers">Manufacturers</a></li>
+                <li class="breadcrumb-item active">New</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-6">
+                <form method="POST">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" aria-describedby="name-help" value="#(context.form.name)">
+                    <small id="name-help" class="form-text text-muted">Foo Bar</small>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

@@ -24,7 +24,10 @@ extension Application {
                                            baseURL: URL(string: "http://api:8080")!,
                                            carImagesBaseURL: URL(string: "https://car-images.jp-fan-app.de")!)
             } else {
-                newClient = JPFanAppClient.production(accessToken: accessToken)
+//                newClient = JPFanAppClient.production(accessToken: accessToken)
+                newClient = JPFanAppClient(accessToken: accessToken,
+                                           baseURL: URL(string: "http://0.0.0.0:8081")!,
+                                           carImagesBaseURL: URL(string: "https://car-images.jp-fan-app.de")!)
             }
             self.storage[ClientKey] = newClient
             return newClient
