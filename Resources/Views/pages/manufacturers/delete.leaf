@@ -5,18 +5,17 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/manufacturers">Manufacturers</a></li>
-                <li class="breadcrumb-item active">New</li>
+                <li class="breadcrumb-item active"><a href="/manufacturers/#(context.manufacturer.id)">#(context.manufacturer.name)</a></li>
+                <li class="breadcrumb-item active">Delete</li>
             </ol>
         </nav>
 
         <div class="row justify-content-md-center">
             <div class="col col-lg-6">
                 <form method="POST">
-                  <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required="" aria-describedby="name-help" value="#(context.form.name)">
-                  </div>
-                  <button type="submit" class="btn btn-primary">Create</button>
+                    <h2>Confirmation</h2>
+                    <p>Do you really want to delete <b>#(context.manufacturer.name)</b></p>
+                    <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
         </div>

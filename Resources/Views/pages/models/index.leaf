@@ -13,7 +13,7 @@
                 <h2>List of all models</h2>
             </div>
             <div class="col-lg-6 col-md-12 text-right">
-                <a href="/manufacturers/#(manufacturer.id)/add-model" class="btn btn-success">New Model</a>
+                <a href="/models/new" class="btn btn-success">New Model</a>
             </div>
         </div>
 
@@ -42,8 +42,10 @@
                         <td>
                             <div class="btn-group" role="group">
                                 <a href="/models/#(model.id)/add-stage" class="btn btn-success">Add Stage</a>
-                                <a href="/models/#(models.id)/edit" class="btn btn-primary">Edit</a>
-                                <a href="/models/#(models.id)/delete" class="btn btn-danger">Delete</a>
+                                #if(isAdmin):
+                                <a href="/models/#(model.id)/edit" class="btn btn-primary">Edit</a>
+                                <a href="/models/#(model.id)/delete" class="btn btn-danger">Delete</a>
+                                #endif
                             </div>
                         </td>
                     </tr>

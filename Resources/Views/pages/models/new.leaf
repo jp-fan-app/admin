@@ -1,0 +1,48 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item active">New</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center ">
+            <div class="col col-lg-6">
+                <form method="POST">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required="" aria-describedby="name-help" value="#(context.form.name)">
+                  </div>
+                  <div class="form-group">
+                    <label for="manufacturerID">Manufacturer</label>
+                    <select class="form-control" id="manufacturerID" name="manufacturerID" aria-describedby="manufacturerID-help">
+                        #for(manufacturer in context.manufacturers):
+                            <option value="#(manufacturer.id)" #if(context.form.manufacturerID == manufacturer.id): selected #endif>#(manufacturer.name)</option>
+                        #endfor
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="transmissionType">Transmission</label>
+                    <select class="form-control" id="transmissionType" name="transmissionType" aria-describedby="transmissionType-help">
+                        <option value="0" #if(context.form.transmissionType == 0): selected #endif>Manual</option>
+                        <option value="1" #if(context.form.transmissionType == 1): selected #endif>Automatic</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="axleType">Axle Type</label>
+                    <select class="form-control" id="axleType" name="axleType" aria-describedby="axleType-help">
+                        <option value="0" #if(context.form.axleType == 0): selected #endif>All</option>
+                        <option value="1" #if(context.form.axleType == 1): selected #endif>Front</option>
+                        <option value="2" #if(context.form.axleType == 2): selected #endif>Rear</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

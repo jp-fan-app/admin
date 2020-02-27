@@ -13,9 +13,11 @@ import JPFanAppClient
 
 final class ManufacturerController {
 
+    // MARK: - Index
+
     struct ManufacturerIndexContext: Codable {
 
-        var manufacturers: [JPFanAppClient.ManufacturerModel]
+        let manufacturers: [JPFanAppClient.ManufacturerModel]
 
     }
 
@@ -28,10 +30,12 @@ final class ManufacturerController {
         }
     }
 
+    // MARK: - Show
+
     struct ManufacturerShowContext: Codable {
 
-        var manufacturer: JPFanAppClient.ManufacturerModel
-        var models: [JPFanAppClient.CarModel]
+        let manufacturer: JPFanAppClient.ManufacturerModel
+        let models: [JPFanAppClient.CarModel]
 
     }
 
@@ -51,15 +55,17 @@ final class ManufacturerController {
         }
     }
 
+    // MARK: - Create
+
     struct CreateForm: Codable {
 
-        var name: String
+        let name: String
 
     }
 
     struct ManufacturerCreateContext: Codable {
 
-        var form: CreateForm
+        let form: CreateForm
 
     }
 
@@ -74,6 +80,85 @@ final class ManufacturerController {
                 return req.redirect(to: "/manufacturers")
             }
             return req.redirect(to: "/manufacturers/\(id)")
+        }
+    }
+
+    // MARK: - Update
+
+    struct EditForm: Codable {
+
+        let name: String
+
+    }
+
+    struct ManufacturerEditContext: Codable {
+
+        let form: EditForm
+        let manufacturer: JPFanAppClient.ManufacturerModel
+
+    }
+
+    func edit(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/manufacturers"))
+        }
+
+        return req.client().manufacturersShow(id: id).flatMap { manufacturer in
+            let context = DefaultContext(.manufacturers,
+                                         ManufacturerEditContext(form: ManufacturerController.EditForm(name: manufacturer.name),
+                                                                 manufacturer: manufacturer),
+                                         isAdmin: req.isAdmin())
+            return req.view.render("pages/manufacturers/edit", context).encodeResponse(for: req)
+        }
+    }
+
+    func update(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/manufacturers"))
+        }
+
+        let editForm = try req.content.decode(EditForm.self)
+
+        return req
+            .client()
+            .manufacturersPatch(id: id, manufacturer: JPFanAppClient.ManufacturerEdit(name: editForm.name))
+            .map
+        { manufacturer in
+            guard let id = manufacturer.id else {
+                return req.redirect(to: "/manufacturers")
+            }
+            return req.redirect(to: "/manufacturers/\(id)")
+        }
+    }
+
+    // MARK: - Delete
+
+    struct ManufacturerDeleteContext: Codable {
+
+        var manufacturer: JPFanAppClient.ManufacturerModel
+
+    }
+
+    func delete(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/manufacturers"))
+        }
+
+        return req.client().manufacturersShow(id: id).flatMap { manufacturer in
+            let context = DefaultContext(.manufacturers,
+                                         ManufacturerDeleteContext(manufacturer: manufacturer),
+                                         isAdmin: req.isAdmin())
+            return req.view.render("pages/manufacturers/delete", context).encodeResponse(for: req)
+        }
+    }
+
+    func deletePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/manufacturers"))
+        }
+
+        return req.client().manufacturersDelete(id: id).map { _ in
+            return req.redirect(to: "/manufacturers")
         }
     }
 

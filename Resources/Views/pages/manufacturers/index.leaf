@@ -7,7 +7,7 @@
                 <li class="breadcrumb-item active">Manufacturers</li>
             </ol>
         </nav>
-        
+
         <div class="row">
             <div class="col-lg-6 col-md-12">
                 <h2>List of all manufacturers</h2>
@@ -37,9 +37,11 @@
                         </td>
                         <td>
                             <div class="btn-group" role="group">
-                                <a href="/manufacturers/#(manufacturer.id)/add-model" class="btn btn-success">Add Model</a>
+                                <a href="/models/new?manufacturer_id=#(manufacturer.id)" class="btn btn-success">Add Model</a>
+                                #if(isAdmin):
                                 <a href="/manufacturers/#(manufacturer.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/manufacturers/#(manufacturer.id)/delete" class="btn btn-danger">Delete</a>
+                                #endif
                             </div>
                         </td>
                     </tr>

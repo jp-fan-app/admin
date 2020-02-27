@@ -14,10 +14,12 @@ struct DefaultContext<Context: Codable>: Encodable {
 
     let navigation: NavigationContext
     let context: Context?
+    let isAdmin: Bool
 
-    init(_ page: NavigationContext.Page, _ context: Context, isAdmin: Bool) {
+    init(_ page: NavigationContext.Page?, _ context: Context, isAdmin: Bool) {
         self.navigation = NavigationContext(page, isAdmin: isAdmin)
         self.context = context
+        self.isAdmin = isAdmin
     }
 
 }
@@ -64,7 +66,7 @@ struct NavigationContext: Encodable {
 
     }
 
-    init(_ page: Page, isAdmin: Bool) {
+    init(_ page: Page?, isAdmin: Bool) {
         let homeSVG = NavigationItem.SVG(viewBox: "0 0 24 24", elementsString: """
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
         """)

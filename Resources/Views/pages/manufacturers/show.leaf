@@ -9,6 +9,21 @@
             </ol>
         </nav>
 
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>Details</h2>
+            </div>
+            <div class="col-lg-6 col-md-12 text-right">
+                <a href="/models/new?manufacturer_id=#(context.manufacturer.id)" class="btn btn-success">Add Model</a>
+                #if(isAdmin):
+                <a href="/manufacturers/#(context.manufacturer.id)/edit" class="btn btn-primary">Edit</a>
+                <a href="/manufacturers/#(context.manufacturer.id)/delete" class="btn btn-danger">Delete</a>
+                #endif
+            </div>
+        </div>
+
+        #(context.manufacturer.name)
+
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
@@ -34,15 +49,16 @@
                         <td>
                             <div class="btn-group" role="group">
                                 <a href="/models/#(model.id)/add-stage" class="btn btn-success">Add Stage</a>
+                                #if(isAdmin):
                                 <a href="/models/#(model.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/models/#(model.id)/delete" class="btn btn-danger">Delete</a>
+                                #endif
                             </div>
                         </td>
                     </tr>
                     #endfor
                 </tbody>
             </table>
-            <a href="/manufacturers/#(manufacturer.id)/add-model" class="btn btn-success">New Model</a>
         </div>
     #endexport
 #endextend

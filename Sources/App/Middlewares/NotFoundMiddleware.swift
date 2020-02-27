@@ -18,7 +18,8 @@ final class NotFoundMiddleware: Middleware {
         return next.respond(to: request).flatMapError { (error) -> EventLoopFuture<Response> in
             if let vaporAbort = error as? Vapor.Abort, vaporAbort.status == .notFound {
                 return request.view.render("pages/404",
-                                           DefaultContext(.dashboard, NoContext(),
+                                           DefaultContext(nil,
+                                                          NoContext(),
                                                           isAdmin: request.isAdmin()))
                     .encodeResponse(for: request)
             }

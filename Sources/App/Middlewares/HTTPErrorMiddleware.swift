@@ -40,7 +40,7 @@ final class HTTPErrorMiddleware: Middleware {
                             }
                             return
                         } else {
-                            let context = DefaultContext(.dashboard,
+                            let context = DefaultContext(nil,
                                                          ClientErrorContext(code: Int(code)),
                                                          isAdmin: request.isAdmin())
                             let renderResult = request.view.render("pages/client-error", context).encodeResponse(for: request)
