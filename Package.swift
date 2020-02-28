@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "app",
     platforms: [
-       .macOS(.v10_14)
+       .macOS(.v10_15)
     ],
     products: [
         .executable(name: "Run", targets: ["Run"]),
@@ -13,7 +13,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0-beta.3"),
         .package(url: "https://github.com/vapor/leaf.git", from: "4.0.0-beta.2"),
-        .package(url: "https://github.com/jp-fan-app/swift-client.git", from: "1.2.2")
+        .package(url: "https://github.com/jp-fan-app/swift-client.git", from: "1.3.1")
     ],
     targets: [
         .target(name: "App", dependencies: ["Vapor", "Leaf", "JPFanAppClient"]),

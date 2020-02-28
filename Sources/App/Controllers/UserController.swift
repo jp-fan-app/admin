@@ -21,7 +21,10 @@ final class UserController {
 
     func index(_ req: Request) throws -> EventLoopFuture<View> {
         return req.client().usersIndex().flatMap { users in
-            let context = DefaultContext(.users, UserIndexContext(users: users), isAdmin: req.isAdmin())
+            let context = DefaultContext(.users,
+                                         UserIndexContext(users: users),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
             return req.view.render("pages/users/index", context)
         }
     }
@@ -42,7 +45,11 @@ final class UserController {
 
         return req.client().usersShow(id: id).flatMap { user in
             return req.client().usersShowTokens(id: id).flatMap { tokens in
-                let context = DefaultContext(.users, UserShowContext(user: user, tokens: tokens), isAdmin: req.isAdmin())
+                let context = DefaultContext(.users,
+                                             UserShowContext(user: user,
+                                                             tokens: tokens),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
                 return req.view.render("pages/users/show", context).encodeResponse(for: req)
             }
         }
@@ -101,7 +108,10 @@ final class UserController {
                                                                         email: user.email,
                                                                         isAdmin: user.isAdmin ? "checked" : nil))
             return req.view.render("pages/users/edit",
-                                   DefaultContext(.users, context, isAdmin: req.isAdmin()))
+                                   DefaultContext(.users,
+                                                  context,
+                                                  isAdmin: req.isAdmin(),
+                                                  username: req.username()))
                 .encodeResponse(for: req)
         }
     }
@@ -144,7 +154,10 @@ final class UserController {
         return req.client().usersShow(id: id).flatMap { user in
             let context = ChangePasswordContext(user: user, form: UserController.ChangePasswordForm(password: ""))
             return req.view.render("pages/users/change-password",
-                                   DefaultContext(.users, context, isAdmin: req.isAdmin()))
+                                   DefaultContext(.users,
+                                                  context,
+                                                  isAdmin: req.isAdmin(),
+                                                  username: req.username()))
                 .encodeResponse(for: req)
         }
     }

@@ -42,7 +42,8 @@ final class HTTPErrorMiddleware: Middleware {
                         } else {
                             let context = DefaultContext(nil,
                                                          ClientErrorContext(code: Int(code)),
-                                                         isAdmin: request.isAdmin())
+                                                         isAdmin: request.isAdmin(),
+                                                         username: request.username())
                             let renderResult = request.view.render("pages/client-error", context).encodeResponse(for: request)
 
                             renderResult.whenComplete { result in

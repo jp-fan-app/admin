@@ -16,4 +16,8 @@ extension Request {
         return session.data["isAdmin"] == "true"
     }
 
+    func username() -> String? {
+        return session.data["username"]
+    }
+
 }

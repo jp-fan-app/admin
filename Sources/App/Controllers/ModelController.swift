@@ -23,7 +23,10 @@ final class ModelController {
 
     func index(_ req: Request) throws -> EventLoopFuture<View> {
         return req.client().modelsIndex().flatMap { models in
-            let context = DefaultContext(.models, ModelIndexContext(models: models), isAdmin: req.isAdmin())
+            let context = DefaultContext(.models,
+                                         ModelIndexContext(models: models),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
             return req.view.render("pages/models/index", context)
         }
     }
@@ -50,7 +53,8 @@ final class ModelController {
                                                  ModelShowContext(model: model,
                                                                   stages: stages,
                                                                   images: images),
-                                                 isAdmin: req.isAdmin())
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
                     return req.view.render("pages/models/show", context).encodeResponse(for: req)
                 }
             }
@@ -85,7 +89,7 @@ final class ModelController {
     func new(_ req: Request) throws -> EventLoopFuture<Response> {
         let modelNewFlags = try? req.query.decode(ModelNewFlags.self)
 
-        return req.client().manufacturersIndex().flatMap { manufacturers in
+        return req.client().allManufacturers().flatMap { manufacturers in
             var form = ModelEditForm(name: "", manufacturerID: nil, transmissionType: nil, axleType: nil)
             if let manufacturerID = modelNewFlags?.manufacturer_id {
                 if manufacturers.contains(where: { $0.id == manufacturerID }) {
@@ -94,7 +98,8 @@ final class ModelController {
             }
             let context = DefaultContext(.models,
                                          ModelEditContext(manufacturers: manufacturers, model: nil, form: form),
-                                         isAdmin: req.isAdmin())
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
             return req.view.render("pages/models/new", context).encodeResponse(for: req)
         }
     }
@@ -117,10 +122,11 @@ final class ModelController {
                 return req.redirect(to: "/models/\(id)")
             }
         } else {
-            return req.client().manufacturersIndex().flatMap { manufacturers in
+            return req.client().allManufacturers().flatMap { manufacturers in
                 let context = DefaultContext(.models,
                                              ModelEditContext(manufacturers: manufacturers, model: nil, form: form),
-                                             isAdmin: req.isAdmin())
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
                 return req.view.render("pages/models/new", context).encodeResponse(for: req)
             }
         }
@@ -134,14 +140,15 @@ final class ModelController {
         }
 
         return req.client().modelsShow(id: id).flatMap { model in
-            return req.client().manufacturersIndex().flatMap { manufacturers in
+            return req.client().allManufacturers().flatMap { manufacturers in
                 let form = ModelEditForm(name: model.name,
                                          manufacturerID: model.manufacturerID,
                                          transmissionType: model.transmissionType,
                                          axleType: model.axleType)
                 let context = DefaultContext(.models,
                                              ModelEditContext(manufacturers: manufacturers, model: model, form: form),
-                                             isAdmin: req.isAdmin())
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
                 return req.view.render("pages/models/edit", context).encodeResponse(for: req)
             }
         }
@@ -185,7 +192,8 @@ final class ModelController {
         return req.client().modelsShow(id: id).flatMap { model in
             let context = DefaultContext(.manufacturers,
                                          ModelDeleteContext(model: model),
-                                         isAdmin: req.isAdmin())
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
             return req.view.render("pages/models/delete", context).encodeResponse(for: req)
         }
     }

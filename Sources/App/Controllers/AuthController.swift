@@ -43,13 +43,15 @@ final class AuthController {
         return req.client().authLogin(email: signIn.email, password: signIn.password).flatMap { loginResult in
             req.session.data["authToken"] = loginResult.token
             req.session.data["isAdmin"] = loginResult.isAdmin ? "true" : "false"
+            req.session.data["username"] = signIn.email
 
             let response = req.redirect(to: "/")
 
             if req.application.environment == .development {
                 response.headers.setCookie = HTTPCookies(dictionaryLiteral:
                     ("authToken", HTTPCookies.Value(string: loginResult.token)),
-                    ("isAdmin", loginResult.isAdmin ? "true" : "false")
+                    ("isAdmin", loginResult.isAdmin ? "true" : "false"),
+                    ("username", HTTPCookies.Value(string: signIn.email))
                 )
             }
 

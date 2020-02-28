@@ -18,15 +18,22 @@ final class ManufacturerController {
     struct ManufacturerIndexContext: Codable {
 
         let manufacturers: [JPFanAppClient.ManufacturerModel]
+        let hasDrafts: Bool
+        let drafts: [JPFanAppClient.ManufacturerModel]
 
     }
 
     func index(_ req: Request) throws -> EventLoopFuture<View> {
         return req.client().manufacturersIndex().flatMap { manufacturers in
-            let context = DefaultContext(.manufacturers,
-                                         ManufacturerIndexContext(manufacturers: manufacturers),
-                                         isAdmin: req.isAdmin())
-            return req.view.render("pages/manufacturers/index", context)
+            return req.client().manufacturersIndexDraft().flatMap { drafts in
+                let context = DefaultContext(.manufacturers,
+                                             ManufacturerIndexContext(manufacturers: manufacturers,
+                                                                      hasDrafts: drafts.count > 0,
+                                                                      drafts: drafts),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/manufacturers/index", context)
+            }
         }
     }
 
@@ -49,7 +56,8 @@ final class ManufacturerController {
                 let context = DefaultContext(.manufacturers,
                                              ManufacturerShowContext(manufacturer: manufacturer,
                                                                      models: models),
-                                             isAdmin: req.isAdmin())
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
                 return req.view.render("pages/manufacturers/show", context).encodeResponse(for: req)
             }
         }
@@ -107,7 +115,8 @@ final class ManufacturerController {
             let context = DefaultContext(.manufacturers,
                                          ManufacturerEditContext(form: ManufacturerController.EditForm(name: manufacturer.name),
                                                                  manufacturer: manufacturer),
-                                         isAdmin: req.isAdmin())
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
             return req.view.render("pages/manufacturers/edit", context).encodeResponse(for: req)
         }
     }
@@ -147,7 +156,8 @@ final class ManufacturerController {
         return req.client().manufacturersShow(id: id).flatMap { manufacturer in
             let context = DefaultContext(.manufacturers,
                                          ManufacturerDeleteContext(manufacturer: manufacturer),
-                                         isAdmin: req.isAdmin())
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
             return req.view.render("pages/manufacturers/delete", context).encodeResponse(for: req)
         }
     }

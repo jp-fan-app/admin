@@ -20,7 +20,8 @@ final class NotFoundMiddleware: Middleware {
                 return request.view.render("pages/404",
                                            DefaultContext(nil,
                                                           NoContext(),
-                                                          isAdmin: request.isAdmin()))
+                                                          isAdmin: request.isAdmin(),
+                                                          username: request.username()))
                     .encodeResponse(for: request)
             }
 

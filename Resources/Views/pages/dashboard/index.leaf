@@ -2,18 +2,12 @@
     #export("title", "Dashboard")
     #export("bodyClass", "")
     #export("body"):
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item active">Manufacturers</li>
-            </ol>
-        </nav>
-
         <div class="row">
             <div class="col-lg-6 col-md-12">
-                <h2>List of all manufacturers</h2>
+                <h2>Pending Manufacturers</h2>
             </div>
             <div class="col-lg-6 col-md-12 text-right">
-                <a href="/manufacturers/new" class="btn btn-success">New Manufacturer</a>
+
             </div>
         </div>
 
@@ -27,38 +21,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    #if(context.hasDrafts):
-                    <tr class="table-warning">
-                        <td colspan="3">
-                            Drafts
-                        </td>
-                    </tr>
-                    #for(manufacturer in context.drafts):
-                    <tr>
-                        <td>
-                            #(manufacturer.id)
-                        </td>
-                        <td>
-                            <a href="/manufacturers/#(manufacturer.id)">#(manufacturer.name)</a>
-                        </td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a href="/models/new?manufacturer_id=#(manufacturer.id)" class="btn btn-success">Add Model</a>
-                                #if(isAdmin):
-                                <a href="/manufacturers/#(manufacturer.id)/edit" class="btn btn-primary">Edit</a>
-                                <a href="/manufacturers/#(manufacturer.id)/delete" class="btn btn-danger">Delete</a>
-                                #endif
-                            </div>
-                        </td>
-                    </tr>
-                    #endfor
-                    <tr class="table-success">
-                        <td colspan="3">
-                            Production
-                        </td>
-                    </tr>
-                    #endif
-                    #for(manufacturer in context.manufacturers):
+                    #for(manufacturer in context.manufacturerDrafts):
                     <tr>
                         <td>
                             #(manufacturer.id)
@@ -80,5 +43,57 @@
                 </tbody>
             </table>
         </div>
+
+
+
+
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>Pending Models</h2>
+            </div>
+            <div class="col-lg-6 col-md-12 text-right">
+
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Main Image</th>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #for(model in context.modelDrafts):
+                    <tr>
+                        <td>
+                            #(model.id)
+                        </td>
+                        <td style="width: 200px;">
+                            <img src="https://car-images.jp-fan-app.de/#(model.mainImageID).jpg" class="rounded img-fluid">
+                        </td>
+                        <td>
+                            <a href="/models/#(model.id)">#(model.name)</a>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/models/#(model.id)/add-stage" class="btn btn-success">Add Stage</a>
+                                #if(isAdmin):
+                                <a href="/models/#(model.id)/edit" class="btn btn-primary">Edit</a>
+                                <a href="/models/#(model.id)/delete" class="btn btn-danger">Delete</a>
+                                #endif
+                            </div>
+                        </td>
+                    </tr>
+                    #endfor
+                </tbody>
+            </table>
+        </div>
+
+
+
     #endexport
 #endextend

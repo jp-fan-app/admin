@@ -15,11 +15,13 @@ struct DefaultContext<Context: Codable>: Encodable {
     let navigation: NavigationContext
     let context: Context?
     let isAdmin: Bool
+    let username: String?
 
-    init(_ page: NavigationContext.Page?, _ context: Context, isAdmin: Bool) {
+    init(_ page: NavigationContext.Page?, _ context: Context, isAdmin: Bool, username: String?) {
         self.navigation = NavigationContext(page, isAdmin: isAdmin)
         self.context = context
         self.isAdmin = isAdmin
+        self.username = username
     }
 
 }

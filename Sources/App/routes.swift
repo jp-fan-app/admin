@@ -26,7 +26,7 @@ func routes(_ app: Application) throws {
 
         let defaultController = DefaultController()
 
-        router.get("dashboard", use: { try defaultController.view($0, view: "pages/dashboard", page: .dashboard) })
+        router.get("dashboard", use: DashboardController().index)
 
         let manufacturerController = ManufacturerController()
         router.get("manufacturers", use: manufacturerController.index)

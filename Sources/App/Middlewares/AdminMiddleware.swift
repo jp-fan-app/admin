@@ -19,7 +19,8 @@ final class AdminMiddleware: Middleware {
             return request.view.render("pages/404",
                                        DefaultContext(nil,
                                                       NoContext(),
-                                                      isAdmin: false)).encodeResponse(for: request)
+                                                      isAdmin: false,
+                                                      username: request.username())).encodeResponse(for: request)
         }
 
         return next.respond(to: request)
