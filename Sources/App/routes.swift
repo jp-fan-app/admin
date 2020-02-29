@@ -49,7 +49,17 @@ func routes(_ app: Application) throws {
         admin.post("models", ":id", "delete", use: modelController.deletePOST)
 
         router.get("videos", use: { try defaultController.view($0, view: "pages/videos", page: .videos) })
-        router.get("videoSeries", use: { try defaultController.view($0, view: "pages/videoSeries", page: .videoSeries) })
+
+        let videoSeriesController = VideoSeriesController()
+        router.get("videoSeries", use: videoSeriesController.index)
+        router.get("videoSeries", ":id", use: videoSeriesController.show)
+        router.get("videoSeries", "new", use: { try defaultController.view($0, view: "pages/videoSeries/new", page: .videoSeries) })
+        router.post("videoSeries", "new", use: videoSeriesController.create)
+        admin.get("videoSeries", ":id", "edit", use: videoSeriesController.edit)
+        admin.post("videoSeries", ":id", "edit", use: videoSeriesController.update)
+        admin.get("videoSeries", ":id", "delete", use: videoSeriesController.delete)
+        admin.post("videoSeries", ":id", "delete", use: videoSeriesController.deletePOST)
+
         admin.get("devices", use: { try defaultController.view($0, view: "pages/devices", page: .devices) })
 
         let userController = UserController()

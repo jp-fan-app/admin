@@ -18,16 +18,22 @@ final class ModelController {
     struct ModelIndexContext: Codable {
 
         let models: [JPFanAppClient.CarModel]
+        let hasDrafts: Bool
+        let drafts: [JPFanAppClient.CarModel]
 
     }
 
     func index(_ req: Request) throws -> EventLoopFuture<View> {
         return req.client().modelsIndex().flatMap { models in
-            let context = DefaultContext(.models,
-                                         ModelIndexContext(models: models),
-                                         isAdmin: req.isAdmin(),
-                                         username: req.username())
-            return req.view.render("pages/models/index", context)
+            return req.client().modelsIndexDraft().flatMap { drafts in
+                let context = DefaultContext(.models,
+                                             ModelIndexContext(models: models,
+                                                               hasDrafts: drafts.count > 0,
+                                                               drafts: drafts),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/index", context)
+            }
         }
     }
 
