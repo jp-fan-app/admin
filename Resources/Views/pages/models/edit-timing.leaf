@@ -1,0 +1,40 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)/stages/#(context.stage.id)">#(context.stage.name)</a></li>
+                <li class="breadcrumb-item">#(context.timing.range)</li>
+                <li class="breadcrumb-item active">Edit</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-6">
+                <form method="POST">
+                  <div class="form-group">
+                    <label for="range">Range</label>
+                    <input type="text" class="form-control" id="range" name="range" required="" aria-describedby="range-help" value="#(context.form.range)">
+                  </div>
+                  <div class="form-group">
+                    <label for="second1">Second 1</label>
+                    <input type="number" step="0.01" class="form-control" id="second1" name="second1" aria-describedby="second1-help" value="#(context.form.second1)">
+                  </div>
+                  <div class="form-group">
+                    <label for="second2">Second 2</label>
+                    <input type="number" step="0.01" class="form-control" id="second2" name="second2" aria-describedby="second2-help" value="#(context.form.second2)">
+                  </div>
+                  <div class="form-group">
+                    <label for="second3">Second 3</label>
+                    <input type="number" step="0.01" class="form-control" id="second3" name="second3" aria-describedby="second3-help" value="#(context.form.second3)">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

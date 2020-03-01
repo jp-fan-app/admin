@@ -6,7 +6,6 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/models">Models</a></li>
                 <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
-                <li class="breadcrumb-item">Images</li>
                 <li class="breadcrumb-item">#(context.image.id)</li>
                 <li class="breadcrumb-item active">Delete</li>
             </ol>

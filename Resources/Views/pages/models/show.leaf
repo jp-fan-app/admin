@@ -28,6 +28,9 @@
             </div>
             <div class="col-lg-6 col-md-12 text-right">
                 <div class="btn-group" role="group">
+                    #if(isAdmin && context.model.isDraft):
+                    <a href="/models/#(context.model.id)/publish" class="btn btn-primary">Publish</a>
+                    #endif
                     #if(isAdmin):
                     <a href="/models/#(context.model.id)/edit" class="btn btn-primary">Edit</a>
                     <a href="/models/#(context.model.id)/delete" class="btn btn-danger">Delete</a>

@@ -63,12 +63,23 @@ func routes(_ app: Application) throws {
         // Stages
         router.get("models", ":id", "add-stage", use: modelController.addStage)
         router.post("models", ":id", "add-stage", use: modelController.addStagePOST)
+        router.get("models", ":id", "stages", ":stageID", use: modelController.showStage)
         router.get("models", ":id", "stages", ":stageID", "edit", use: modelController.editStage)
         router.post("models", ":id", "stages", ":stageID", "edit", use: modelController.editStagePOST)
         router.get("models", ":id", "stages", ":stageID", "delete", use: modelController.deleteStage)
         router.post("models", ":id", "stages", ":stageID", "delete", use: modelController.deleteStagePOST)
         router.get("models", ":id", "stages", ":stageID", "publish", use: modelController.publishStage)
         router.post("models", ":id", "stages", ":stageID", "publish", use: modelController.publishStagePOST)
+        // Stage Timings
+        router.get("models", ":id", "stages", ":stageID", "add-timing", use: modelController.addTiming)
+        router.post("models", ":id", "stages", ":stageID", "add-timing", use: modelController.addTimingPOST)
+        router.get("models", ":id", "stages", ":stageID", "timings", ":timingID", "edit", use: modelController.editTiming)
+        router.post("models", ":id", "stages", ":stageID", "timings", ":timingID", "edit", use: modelController.editTimingPOST)
+        router.get("models", ":id", "stages", ":stageID", "timings", ":timingID", "delete", use: modelController.deleteTiming)
+        router.post("models", ":id", "stages", ":stageID", "timings", ":timingID", "delete", use: modelController.deleteTimingPOST)
+        router.get("models", ":id", "stages", ":stageID", "timings", ":timingID", "publish", use: modelController.publishTiming)
+        router.post("models", ":id", "stages", ":stageID", "timings", ":timingID", "publish", use: modelController.publishTimingPOST)
+        router.get("timings", ":id", "find", use: modelController.findTiming)
 
         router.get("videos", use: { try defaultController.view($0, view: "pages/videos", page: .videos) })
 

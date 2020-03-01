@@ -6,7 +6,8 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/models">Models</a></li>
                 <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
-                <li class="breadcrumb-item">#(context.stage.id)</li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)/stages/#(context.stage.id)">#(context.stage.id)</a></li>
+                <li class="breadcrumb-item">#(context.timing.range)</li>
                 <li class="breadcrumb-item active">Delete</li>
             </ol>
         </nav>
@@ -15,7 +16,7 @@
             <div class="col col-lg-6">
                 <form method="POST">
                     <h2>Confirmation</h2>
-                    <p>Do you really want to delete stage <b>#(context.stage.name)</b> from <b>#(context.model.name)</b></p>
+                    <p>Do you really want to delete timing <b>#(context.timing.range)</b> for stage <b>#(context.stage.name)</b> from <b>#(context.model.name)</b></p>
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>

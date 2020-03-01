@@ -1,0 +1,134 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
+                <li class="breadcrumb-item">Stage</li>
+                <li class="breadcrumb-item active">#(context.stage.name)</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>Details</h2>
+
+                Name: #(context.stage.name)<br>
+                Description: #(context.stage.description)<br>
+                LaSiSe : #(context.stage.lasiseInSeconds)<br>
+                PS: #(context.stage.ps)<br>
+                NM: #(context.stage.nm)<br>
+            </div>
+            <div class="col-lg-6 col-md-12 text-right">
+                <div class="btn-group" role="group">
+                    <a href="/models/#(context.model.id)/stages/#(context.stage.id)/add-timing" class="btn btn-success">New Timing</a>
+                    #if(isAdmin && context.stage.isDraft):
+                    <a href="/models/#(context.model.id)/stages/#(context.stage.id)/publish" class="btn btn-primary">Publish</a>
+                    #endif
+                    #if(isAdmin):
+                    <a href="/models/#(context.model.id)/stages/#(context.stage.id)/edit" class="btn btn-primary">Edit</a>
+                    <a href="/models/#(context.model.id)/stages/#(context.stage.id)/delete" class="btn btn-danger">Delete</a>
+                    #endif
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12">
+                        <h3>Timings</h3>
+                    </div>
+                    <div class="col-lg-6 col-md-12 text-right">
+
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Range</th>
+                                <th>Second 1</th>
+                                <th>Second 2</th>
+                                <th>Second 3</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            #if(context.hasDraftTimings):
+                            <tr class="table-warning">
+                                <td colspan="6">
+                                    Drafts
+                                </td>
+                            </tr>
+                            #for(timing in context.draftTimings):
+                            <tr>
+                                <td>
+                                    #(timing.id)
+                                </td>
+                                <td>
+                                    #(timing.range)
+                                </td>
+                                <td>
+                                    #(timing.second1)
+                                </td>
+                                <td>
+                                    #(timing.second2)
+                                </td>
+                                <td>
+                                    #(timing.second3)
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        #if(isAdmin):
+                                        <a href="/models/#(context.model.id)/stages/#(context.stage.id)/timings/#(timing.id)/publish" class="btn btn-primary">Publish</a>
+                                        <a href="/models/#(context.model.id)/stages/#(context.stage.id)/timings/#(timing.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(context.model.id)/stages/#(context.stage.id)/timings/#(timing.id)/delete" class="btn btn-danger">Delete</a>
+                                        #endif
+                                    </div>
+                                </td>
+                            </tr>
+                            #endfor
+                            <tr class="table-success">
+                                <td colspan="6">
+                                    Production
+                                </td>
+                            </tr>
+                            #endif
+                            #for(timing in context.timings):
+                            <tr>
+                                <td>
+                                    #(timing.id)
+                                </td>
+                                <td>
+                                    #(timing.range)
+                                </td>
+                                <td>
+                                    #(timing.second1)
+                                </td>
+                                <td>
+                                    #(timing.second2)
+                                </td>
+                                <td>
+                                    #(timing.second3)
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        #if(isAdmin):
+                                        <a href="/models/#(context.model.id)/stages/#(context.stage.id)/timings/#(timing.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(context.model.id)/stages/#(context.stage.id)/timings/#(timing.id)/delete" class="btn btn-danger">Delete</a>
+                                        #endif
+                                    </div>
+                                </td>
+                            </tr>
+                            #endfor
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    #endexport
+#endextend

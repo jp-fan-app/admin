@@ -537,6 +537,45 @@ final class ModelController {
         }
     }
 
+    // MARK: - Show Stage
+
+    struct ShowStageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+        let timings: [JPFanAppClient.StageTiming]
+        let hasDraftTimings: Bool
+        let draftTimings: [JPFanAppClient.StageTiming]
+
+    }
+
+    func showStage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                return req.client().stagesTimings(id: stageID).flatMap { timings in
+                    return req.client().stagesTimingsDraft(id: stageID).flatMap { draftTimings in
+                        let context = DefaultContext(.manufacturers,
+                                                     ShowStageContext(model: model,
+                                                                      stage: stage,
+                                                                      timings: timings,
+                                                                      hasDraftTimings: draftTimings.count > 0,
+                                                                      draftTimings: draftTimings),
+                                                     isAdmin: req.isAdmin(),
+                                                     username: req.username())
+                        return req.view.render("pages/models/stage", context).encodeResponse(for: req)
+                    }
+                }
+            }
+        }
+    }
+
     // MARK: - Edit Stage
 
     struct EditStageContext: Codable {
@@ -715,5 +754,288 @@ final class ModelController {
             return req.redirect(to: "/models/\(id)")
         }
     }
+
+    // MARK: - Add Timing
+
+    struct AddTimingContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+
+    }
+
+    struct AddTimingForm: Codable {
+
+        let range: String
+        let second1: String?
+        let second2: String?
+        let second3: String?
+
+    }
+
+    func addTiming(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                let context = DefaultContext(.manufacturers,
+                                             AddTimingContext(model: model, stage: stage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/add-timing", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func addTimingPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        let form = try req.content.decode(AddTimingForm.self)
+        var second1: Double? = nil
+        if let second1String = form.second1 {
+            second1 = Double(second1String)
+        }
+        var second2: Double? = nil
+        if let second2String = form.second2 {
+            second2 = Double(second2String)
+        }
+        var second3: Double? = nil
+        if let second3String = form.second3 {
+            second3 = Double(second3String)
+        }
+
+        let timing = JPFanAppClient.StageTiming(stageID: stageID, range: form.range, second1: second1,
+                                                second2: second2, second3: second3)
+        return req.client().timingsCreate(timing: timing).flatMap { carStage in
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+    }
+
+    // MARK: - Edit Timing
+
+    struct EditTimingContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+        let timing: JPFanAppClient.StageTiming
+        let form: EditTimingForm
+
+    }
+
+    struct EditTimingForm: Codable {
+
+        let range: String
+        let second1: String?
+        let second2: String?
+        let second3: String?
+
+    }
+
+    func editTiming(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let timingID = req.parameters.get("timingID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                return req.client().timingsShow(id: timingID).flatMap { timing in
+                    let nf = NumberFormatter()
+                    nf.numberStyle = .decimal
+                    nf.decimalSeparator = "."
+                    nf.maximumFractionDigits = 2
+
+                    var second1: String? = nil
+                    if let second1Double = timing.second1 {
+                        second1 = nf.string(from: NSNumber(value: second1Double))
+                    }
+                    var second2: String? = nil
+                    if let second2Double = timing.second2 {
+                        second2 = nf.string(from: NSNumber(value: second2Double))
+                    }
+                    var second3: String? = nil
+                    if let second3Double = timing.second3 {
+                        second3 = nf.string(from: NSNumber(value: second3Double))
+                    }
+
+                    let form = EditTimingForm(range: timing.range, second1: second1, second2: second2, second3: second3)
+                    let context = DefaultContext(.manufacturers,
+                                                 EditTimingContext(model: model, stage: stage, timing: timing, form: form),
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
+                    return req.view.render("pages/models/edit-timing", context).encodeResponse(for: req)
+                }
+            }
+        }
+    }
+
+    func editTimingPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let timingID = req.parameters.get("timingID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        let form = try req.content.decode(EditTimingForm.self)
+        var second1: Double? = nil
+        if let second1String = form.second1 {
+            second1 = Double(second1String)
+        }
+        var second2: Double? = nil
+        if let second2String = form.second2 {
+            second2 = Double(second2String)
+        }
+        var second3: Double? = nil
+        if let second3String = form.second3 {
+            second3 = Double(second3String)
+        }
+
+        let timing = JPFanAppClient.StageTiming(stageID: stageID, range: form.range, second1: second1,
+                                                second2: second2, second3: second3)
+        return req.client().timingsPatch(id: timingID, timing: timing).flatMap { carStage in
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+    }
+
+    // MARK: - Delete Timing
+
+    struct ModelDeleteTimingContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+        let timing: JPFanAppClient.StageTiming
+
+    }
+
+    func deleteTiming(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let timingID = req.parameters.get("timingID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                return req.client().timingsShow(id: timingID).flatMap { timing in
+                    let context = DefaultContext(.manufacturers,
+                                                 ModelDeleteTimingContext(model: model, stage: stage, timing: timing),
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
+                    return req.view.render("pages/models/delete-timing", context).encodeResponse(for: req)
+                }
+            }
+        }
+    }
+
+    func deleteTimingPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let timingID = req.parameters.get("timingID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().timingsDelete(id: timingID).map { _ in
+            return req.redirect(to: "/models/\(id)/stages/\(stageID)")
+        }
+    }
+
+    // MARK: - Find Timing
+
+    func findTiming(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        return req.client().timingsShow(id: id).flatMap { timing in
+            return req.client().stagesShow(id: timing.stageID).flatMap { stage in
+                guard let stageID = stage.id else {
+                    return req.eventLoop.future(req.redirect(to: "/"))
+                }
+                return req.client().modelsShow(id: stage.carModelID).flatMap { model in
+                    guard let modelID = model.id else {
+                        return req.eventLoop.future(req.redirect(to: "/"))
+                    }
+                    return req.eventLoop.future(req.redirect(to: "/models/\(modelID)/stages/\(stageID)"))
+                }
+            }
+        }
+    }
+
+    // MARK: - Publish Timing
+
+    struct ModelPublishTimingContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+        let timing: JPFanAppClient.StageTiming
+
+    }
+
+    func publishTiming(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let timingID = req.parameters.get("timingID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                return req.client().timingsShow(id: timingID).flatMap { timing in
+                    let context = DefaultContext(.manufacturers,
+                                                 ModelPublishTimingContext(model: model, stage: stage, timing: timing),
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
+                    return req.view.render("pages/models/publish-timing", context).encodeResponse(for: req)
+                }
+            }
+        }
+    }
+
+    func publishTimingPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let timingID = req.parameters.get("timingID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().timingsPublish(id: timingID).map { _ in
+            return req.redirect(to: "/models/\(id)/stages/\(stageID)")
+        }
+    }
+
 
 }

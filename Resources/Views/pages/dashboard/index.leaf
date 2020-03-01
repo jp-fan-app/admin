@@ -2,6 +2,16 @@
     #export("title", "Dashboard")
     #export("bodyClass", "")
     #export("body"):
+
+        #if(!context.hasDrafts):
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>No Pending Drafts</h2>
+            </div>
+        </div>
+        #endif
+
+        #if(context.hasManufacturerDrafts):
         <div class="row">
             <div class="col-lg-6 col-md-12">
                 <h2>Pending Manufacturers</h2>
@@ -44,10 +54,11 @@
                 </tbody>
             </table>
         </div>
+        #endif
 
 
 
-
+        #if(context.hasModelDrafts):
         <div class="row">
             <div class="col-lg-6 col-md-12">
                 <h2>Pending Models</h2>
@@ -94,11 +105,12 @@
                 </tbody>
             </table>
         </div>
+        #endif
 
 
 
 
-
+        #if(context.hasVideoSerieDrafts):
         <div class="row">
             <div class="col-lg-6 col-md-12">
                 <h2>Pending Video Series</h2>
@@ -145,11 +157,12 @@
                 </tbody>
             </table>
         </div>
+        #endif
 
 
 
 
-
+        #if(context.hasImageDrafts):
         <div class="row">
             <div class="col-lg-6 col-md-12">
                 <h2>Pending Car Images</h2>
@@ -210,9 +223,11 @@
                 </tbody>
             </table>
         </div>
+        #endif
 
 
 
+        #if(context.hasStageDrafts):
         <div class="row">
             <div class="col-lg-6 col-md-12">
                 <h2>Pending Car Stages</h2>
@@ -271,6 +286,62 @@
                 </tbody>
             </table>
         </div>
+        #endif
+
+
+
+
+        #if(context.hasTimingDrafts):
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>Pending Stage Timings</h2>
+            </div>
+            <div class="col-lg-6 col-md-12 text-right">
+
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Range</th>
+                        <th>Second 1</th>
+                        <th>Second 2</th>
+                        <th>Second 3</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #for(timing in context.timingDrafts):
+                    <tr>
+                        <td>
+                            #(timing.id)
+                        </td>
+                        <td>
+                            #(timing.range)
+                        </td>
+                        <td>
+                            #(timing.second1)
+                        </td>
+                        <td>
+                            #(timing.second2)
+                        </td>
+                        <td>
+                            #(timing.second3)
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/timings/#(timing.id)/find" class="btn btn-primary">Show Stage</a>
+                            </div>
+                        </td>
+                    </tr>
+                    #endfor
+                </tbody>
+            </table>
+        </div>
+        #endif
 
 
     #endexport
