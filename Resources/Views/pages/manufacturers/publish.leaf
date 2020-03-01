@@ -4,8 +4,8 @@
     #export("body"):
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/videoSeries">Video Series</a></li>
-                <li class="breadcrumb-item"><a href="/videoSeries/#(context.videoSerie.id)">#(context.videoSerie.title)</a></li>
+                <li class="breadcrumb-item"><a href="/manufacturers">Manufacturers</a></li>
+                <li class="breadcrumb-item active"><a href="/manufacturers/#(context.manufacturer.id)">#(context.manufacturer.name)</a></li>
                 <li class="breadcrumb-item active">Publish</li>
             </ol>
         </nav>
@@ -14,7 +14,7 @@
             <div class="col col-lg-6">
                 <form method="POST">
                     <h2>Confirmation</h2>
-                    <p>Do you really want to publish <b>#(context.videoSerie.title)</b></p>
+                    <p>Do you really want to publish <b>#(context.manufacturer.name)</b></p>
                     <button type="submit" class="btn btn-primary">Publish</button>
                 </form>
             </div>

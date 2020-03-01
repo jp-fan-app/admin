@@ -19,6 +19,7 @@ final class DashboardController {
         let modelDrafts: [JPFanAppClient.CarModel]
         let videoSerieDrafts: [JPFanAppClient.VideoSerie]
         let imageDrafts: [JPFanAppClient.CarImage]
+        let stageDrafts: [JPFanAppClient.CarStage]
 
     }
 
@@ -27,14 +28,17 @@ final class DashboardController {
             return req.client().modelsIndexDraft().flatMap { modelDrafts in
                 return req.client().videoSeriesIndexDraft().flatMap { videoSerieDrafts in
                     return req.client().imagesIndexDraft().flatMap { imageDrafts in
-                        let context = DefaultContext(.dashboard,
-                                                     DashboardIndexContext(manufacturerDrafts: manufacturerDrafts,
-                                                                           modelDrafts: modelDrafts,
-                                                                           videoSerieDrafts: videoSerieDrafts,
-                                                                           imageDrafts: imageDrafts),
-                                                     isAdmin: req.isAdmin(),
-                                                     username: req.username())
-                        return req.view.render("pages/dashboard/index", context)
+                        return req.client().stagesIndexDraft().flatMap { stageDrafts in
+                            let context = DefaultContext(.dashboard,
+                                                         DashboardIndexContext(manufacturerDrafts: manufacturerDrafts,
+                                                                               modelDrafts: modelDrafts,
+                                                                               videoSerieDrafts: videoSerieDrafts,
+                                                                               imageDrafts: imageDrafts,
+                                                                               stageDrafts: stageDrafts),
+                                                         isAdmin: req.isAdmin(),
+                                                         username: req.username())
+                            return req.view.render("pages/dashboard/index", context)
+                        }
                     }
                 }
             }

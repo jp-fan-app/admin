@@ -182,4 +182,36 @@ final class VideoSeriesController {
         }
     }
 
+    // MARK: - Publish
+
+    struct VideoSeriePublishContext: Codable {
+
+        var videoSerie: JPFanAppClient.VideoSerie
+
+    }
+
+    func publish(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+
+        return req.client().videoSeriesShow(id: id).flatMap { videoSerie in
+            let context = DefaultContext(.videoSeries,
+                                         VideoSeriePublishContext(videoSerie: videoSerie),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
+            return req.view.render("pages/videoSeries/publish", context).encodeResponse(for: req)
+        }
+    }
+
+    func publishPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+
+        return req.client().videoSeriesPublish(id: id).map { _ in
+            return req.redirect(to: "/videoSeries/\(id)")
+        }
+    }
+
 }

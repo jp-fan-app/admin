@@ -45,6 +45,7 @@
                             <div class="btn-group" role="group">
                                 <a href="/models/new?manufacturer_id=#(manufacturer.id)" class="btn btn-success">Add Model</a>
                                 #if(isAdmin):
+                                <a href="/manufacturers/#(manufacturer.id)/publish" class="btn btn-primary">Publish</a>
                                 <a href="/manufacturers/#(manufacturer.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/manufacturers/#(manufacturer.id)/delete" class="btn btn-danger">Delete</a>
                                 #endif

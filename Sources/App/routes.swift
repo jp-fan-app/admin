@@ -37,6 +37,8 @@ func routes(_ app: Application) throws {
         admin.post("manufacturers", ":id", "edit", use: manufacturerController.update)
         admin.get("manufacturers", ":id", "delete", use: manufacturerController.delete)
         admin.post("manufacturers", ":id", "delete", use: manufacturerController.deletePOST)
+        admin.get("manufacturers", ":id", "publish", use: manufacturerController.publish)
+        admin.post("manufacturers", ":id", "publish", use: manufacturerController.publishPOST)
 
         let modelController = ModelController()
         router.get("models", use: modelController.index)
@@ -47,12 +49,26 @@ func routes(_ app: Application) throws {
         admin.post("models", ":id", "edit", use: modelController.update)
         admin.get("models", ":id", "delete", use: modelController.delete)
         admin.post("models", ":id", "delete", use: modelController.deletePOST)
+        admin.get("models", ":id", "publish", use: modelController.publish)
+        admin.post("models", ":id", "publish", use: modelController.publishPOST)
+        // Images
         router.get("models", ":id", "add-image", use: modelController.addImage)
         router.post("models", ":id", "add-image", use: modelController.addImagePOST)
         router.get("models", ":id", "images", ":imageID", "upload-image", use: modelController.uploadImage)
         router.post("models", ":id", "images", ":imageID","upload-image", use: modelController.uploadImagePOST)
         admin.get("models", ":id", "images", ":imageID", "delete", use: modelController.deleteImage)
         admin.post("models", ":id", "images", ":imageID", "delete", use: modelController.deleteImagePOST)
+        admin.get("models", ":id", "images", ":imageID", "publish", use: modelController.publishImage)
+        admin.post("models", ":id", "images", ":imageID", "publish", use: modelController.publishImagePOST)
+        // Stages
+        router.get("models", ":id", "add-stage", use: modelController.addStage)
+        router.post("models", ":id", "add-stage", use: modelController.addStagePOST)
+        router.get("models", ":id", "stages", ":stageID", "edit", use: modelController.editStage)
+        router.post("models", ":id", "stages", ":stageID", "edit", use: modelController.editStagePOST)
+        router.get("models", ":id", "stages", ":stageID", "delete", use: modelController.deleteStage)
+        router.post("models", ":id", "stages", ":stageID", "delete", use: modelController.deleteStagePOST)
+        router.get("models", ":id", "stages", ":stageID", "publish", use: modelController.publishStage)
+        router.post("models", ":id", "stages", ":stageID", "publish", use: modelController.publishStagePOST)
 
         router.get("videos", use: { try defaultController.view($0, view: "pages/videos", page: .videos) })
 
@@ -65,6 +81,8 @@ func routes(_ app: Application) throws {
         admin.post("videoSeries", ":id", "edit", use: videoSeriesController.update)
         admin.get("videoSeries", ":id", "delete", use: videoSeriesController.delete)
         admin.post("videoSeries", ":id", "delete", use: videoSeriesController.deletePOST)
+        admin.get("videoSeries", ":id", "publish", use: videoSeriesController.publish)
+        admin.post("videoSeries", ":id", "publish", use: videoSeriesController.publishPOST)
 
         let devicesController = DevicesController()
         admin.get("devices", use: devicesController.index)
@@ -76,8 +94,12 @@ func routes(_ app: Application) throws {
         admin.post("users", "new", use: userController.create)
         admin.get("users", ":id", "edit", use: userController.edit)
         admin.post("users", ":id", "edit", use: userController.update)
-        admin.get("users", ":id", "change-password", use: userController.changePasswordGET)
+        admin.get("users", ":id", "change-password", use: userController.changePassword)
         admin.post("users", ":id", "change-password", use: userController.changePasswordPOST)
+        admin.get("users", ":id", "remove-all-tokens", use: userController.removeAllTokens)
+        admin.post("users", ":id", "remove-all-tokens", use: userController.removeAllTokensPOST)
+        admin.get("users", ":id", "delete", use: userController.delete)
+        admin.post("users", ":id", "delete", use: userController.deletePOST)
 
 
         router.get("signout", use: AuthController().signOut)

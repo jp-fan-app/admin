@@ -43,6 +43,8 @@ final class ManufacturerController {
 
         let manufacturer: JPFanAppClient.ManufacturerModel
         let models: [JPFanAppClient.CarModel]
+        let hasDraftModels: Bool
+        let draftModels: [JPFanAppClient.CarModel]
 
     }
 
@@ -52,13 +54,17 @@ final class ManufacturerController {
         }
 
         return req.client().manufacturersShow(id: id).flatMap { manufacturer in
-            req.client().manufacturersModels(id: id).flatMap { models in
-                let context = DefaultContext(.manufacturers,
-                                             ManufacturerShowContext(manufacturer: manufacturer,
-                                                                     models: models),
-                                             isAdmin: req.isAdmin(),
-                                             username: req.username())
-                return req.view.render("pages/manufacturers/show", context).encodeResponse(for: req)
+            return req.client().manufacturersModels(id: id).flatMap { models in
+                return req.client().manufacturersModelsDraft(id: id).flatMap { draftModels in
+                    let context = DefaultContext(.manufacturers,
+                                                 ManufacturerShowContext(manufacturer: manufacturer,
+                                                                         models: models,
+                                                                         hasDraftModels: draftModels.count > 0,
+                                                                         draftModels: draftModels),
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
+                    return req.view.render("pages/manufacturers/show", context).encodeResponse(for: req)
+                }
             }
         }
     }
@@ -169,6 +175,38 @@ final class ManufacturerController {
 
         return req.client().manufacturersDelete(id: id).map { _ in
             return req.redirect(to: "/manufacturers")
+        }
+    }
+
+    // MARK: - Delete
+
+    struct ManufacturerPublishContext: Codable {
+
+        var manufacturer: JPFanAppClient.ManufacturerModel
+
+    }
+
+    func publish(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/manufacturers"))
+        }
+
+        return req.client().manufacturersShow(id: id).flatMap { manufacturer in
+            let context = DefaultContext(.manufacturers,
+                                         ManufacturerPublishContext(manufacturer: manufacturer),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
+            return req.view.render("pages/manufacturers/publish", context).encodeResponse(for: req)
+        }
+    }
+
+    func publishPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/manufacturers"))
+        }
+
+        return req.client().manufacturersPublish(id: id).map { _ in
+            return req.redirect(to: "/manufacturers/\(id)")
         }
     }
 

@@ -146,7 +146,7 @@ final class UserController {
 
     }
 
-    func changePasswordGET(_ req: Request) throws -> EventLoopFuture<Response> {
+    func changePassword(_ req: Request) throws -> EventLoopFuture<Response> {
         guard let id = req.parameters.get("id", as: Int.self) else {
             return req.eventLoop.future(req.redirect(to: "/users"))
         }
@@ -170,6 +170,73 @@ final class UserController {
         let form = try req.content.decode(ChangePasswordForm.self)
         return req.client().usersChangePassword(id: id, newPassword: form.password).map { user in
             return req.redirect(to: "/users/\(user.id)")
+        }
+    }
+
+    // MARK: - Remove all tokens
+
+    struct UserRemoveAllTokensContext: Codable {
+
+        let user: JPFanAppClient.User
+        let tokens: [JPFanAppClient.UserToken]
+
+    }
+
+    func removeAllTokens(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/users"))
+        }
+
+        return req.client().usersShow(id: id).flatMap { user in
+            return req.client().usersShowTokens(id: id).flatMap { tokens in
+                let context = DefaultContext(.manufacturers,
+                                             UserRemoveAllTokensContext(user: user, tokens: tokens),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/users/remove-all-tokens", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func removeAllTokensPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().usersDeleteTokens(id: id).map { _ in
+            return req.redirect(to: "/users/\(id)")
+        }
+    }
+
+    // MARK: - Delete Stage
+
+    struct UserDeleteContext: Codable {
+
+        let user: JPFanAppClient.User
+
+    }
+
+    func delete(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/users"))
+        }
+
+        return req.client().usersShow(id: id).flatMap { user in
+            let context = DefaultContext(.manufacturers,
+                                         UserDeleteContext(user: user),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
+            return req.view.render("pages/users/delete", context).encodeResponse(for: req)
+        }
+    }
+
+    func deletePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/users"))
+        }
+
+        return req.client().usersDelete(id: id).map { _ in
+            return req.redirect(to: "/users")
         }
     }
 

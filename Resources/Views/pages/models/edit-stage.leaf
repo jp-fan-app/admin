@@ -1,0 +1,48 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
+                <li class="breadcrumb-item">Stages</li>
+                <li class="breadcrumb-item">#(context.stage.name)</li>
+                <li class="breadcrumb-item active">Edit Stage</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-6">
+                <form method="POST">
+                  <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required="" aria-describedby="name-help" value="#(context.form.name)">
+                  </div>
+                  <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" class="form-control" id="description" name="description" aria-describedby="name-help" value="#(context.form.description)">
+                  </div>
+                  <div class="form-group">
+                    <label for="isStock">Is Stock</label>
+                    <input type="checkbox" class="form-control" id="isStock" name="isStock" aria-describedby="isStock-help" value="checked" #if(context.form.isStock): checked="checked" #endif>
+                  </div>
+                  <div class="form-group">
+                    <label for="lasiseInSeconds">LaSiSe in seconds</label>
+                    <input type="number" step="0.01" class="form-control" id="lasiseInSeconds" name="lasiseInSeconds" aria-describedby="lasiseInSeconds-help" value="#(context.form.lasiseInSeconds)">
+                  </div>
+                  <div class="form-group">
+                    <label for="ps">PS</label>
+                    <input type="number" step="0.01" class="form-control" id="ps" name="ps" aria-describedby="ps-help" value="#(context.form.ps)">
+                  </div>
+                  <div class="form-group">
+                    <label for="nm">NM</label>
+                    <input type="number" step="0.01" class="form-control" id="nm" name="nm" aria-describedby="nm-help" value="#(context.form.nm)">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

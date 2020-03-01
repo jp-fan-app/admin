@@ -52,13 +52,17 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
+                                <th>Is Stock</th>
+                                <th>LaSiSe</th>
+                                <th>PS</th>
+                                <th>NM</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             #if(context.hasDraftStages):
                             <tr class="table-warning">
-                                <td colspan="3">
+                                <td colspan="7">
                                     Drafts
                                 </td>
                             </tr>
@@ -68,21 +72,34 @@
                                     #(stage.id)
                                 </td>
                                 <td>
-                                    <a href="/models/#(context.model.id)/stage/#(stage.id)">#(stage.name)</a>
+                                    <a href="/models/#(context.model.id)/stages/#(stage.id)">#(stage.name)</a>
+                                </td>
+                                <td>
+                                    #(stage.isStock)
+                                </td>
+                                <td>
+                                    #(stage.lasiseInSeconds)
+                                </td>
+                                <td>
+                                    #(stage.ps)
+                                </td>
+                                <td>
+                                    #(stage.nm)
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/add-timing" class="btn btn-success">Add Timing</a>
+                                        <a href="/models/#(context.model.id)/stages/#(stage.id)/add-timing" class="btn btn-success">Add Timing</a>
                                         #if(isAdmin):
-                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/edit" class="btn btn-primary">Edit</a>
-                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/delete" class="btn btn-danger">Delete</a>
+                                        <a href="/models/#(context.model.id)/stages/#(stage.id)/publish" class="btn btn-primary">Publish</a>
+                                        <a href="/models/#(context.model.id)/stages/#(stage.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(context.model.id)/stages/#(stage.id)/delete" class="btn btn-danger">Delete</a>
                                         #endif
                                     </div>
                                 </td>
                             </tr>
                             #endfor
                             <tr class="table-success">
-                                <td colspan="3">
+                                <td colspan="7">
                                     Production
                                 </td>
                             </tr>
@@ -93,14 +110,26 @@
                                     #(stage.id)
                                 </td>
                                 <td>
-                                    <a href="/models/#(context.model.id)/stage/#(stage.id)">#(stage.name)</a>
+                                    <a href="/models/#(context.model.id)/stages/#(stage.id)">#(stage.name)</a>
+                                </td>
+                                <td>
+                                    #(stage.isStock)
+                                </td>
+                                <td>
+                                    #(stage.lasiseInSeconds)
+                                </td>
+                                <td>
+                                    #(stage.ps)
+                                </td>
+                                <td>
+                                    #(stage.nm)
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/add-timing" class="btn btn-success">Add Timing</a>
+                                        <a href="/models/#(context.model.id)/stages/#(stage.id)/add-timing" class="btn btn-success">Add Timing</a>
                                         #if(isAdmin):
-                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/edit" class="btn btn-primary">Edit</a>
-                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/delete" class="btn btn-danger">Delete</a>
+                                        <a href="/models/#(context.model.id)/stages/#(stage.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(context.model.id)/stages/#(stage.id)/delete" class="btn btn-danger">Delete</a>
                                         #endif
                                     </div>
                                 </td>
@@ -161,6 +190,7 @@
                                         <a href="/models/#(context.model.id)/images/#(image.id)/upload-image" class="btn btn-success">Upload</a>
                                         #endif
                                         #if(isAdmin):
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/publish" class="btn btn-primary">Publish</a>
                                         <a href="/models/#(context.model.id)/images/#(image.id)/edit" class="btn btn-primary">Edit</a>
                                         <a href="/models/#(context.model.id)/images/#(image.id)/delete" class="btn btn-danger">Delete</a>
                                         #endif

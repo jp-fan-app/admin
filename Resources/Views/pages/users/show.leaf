@@ -14,9 +14,12 @@
                 <h2>Details</h2>
             </div>
             <div class="col-lg-6 col-md-12 text-right">
-                <a href="/users/#(context.user.id)/edit" class="btn btn-primary">Edit</a>
-                <a href="/users/#(context.user.id)/change-password" class="btn btn-warning">Change Password</a>
-                <a href="/users/#(context.user.id)/remove-all-tokens" class="btn btn-danger">Remove all Tokens</a>
+                <div class="btn-group" role="group">
+                    <a href="/users/#(context.user.id)/edit" class="btn btn-primary">Edit</a>
+                    <a href="/users/#(context.user.id)/change-password" class="btn btn-warning">Change Password</a>
+                    <a href="/users/#(context.user.id)/remove-all-tokens" class="btn btn-danger">Remove all Tokens</a>
+                    <a href="/users/#(context.user.id)/delete" class="btn btn-danger">Delete</a>
+                </div>
             </div>
         </div>
 

@@ -4,8 +4,10 @@
     #export("body"):
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/videoSeries">Video Series</a></li>
-                <li class="breadcrumb-item"><a href="/videoSeries/#(context.videoSerie.id)">#(context.videoSerie.title)</a></li>
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
+                <li class="breadcrumb-item">Images</li>
+                <li class="breadcrumb-item">#(context.image.id)</li>
                 <li class="breadcrumb-item active">Publish</li>
             </ol>
         </nav>
@@ -14,7 +16,7 @@
             <div class="col col-lg-6">
                 <form method="POST">
                     <h2>Confirmation</h2>
-                    <p>Do you really want to publish <b>#(context.videoSerie.title)</b></p>
+                    <p>Do you really want to publish image <b>#(context.image.id)</b> from <b>#(context.model.name)</b></p>
                     <button type="submit" class="btn btn-primary">Publish</button>
                 </form>
             </div>

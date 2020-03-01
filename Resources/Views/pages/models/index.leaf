@@ -49,6 +49,7 @@
                             <div class="btn-group" role="group">
                                 <a href="/models/#(model.id)/add-stage" class="btn btn-success">Add Stage</a>
                                 #if(isAdmin):
+                                <a href="/models/#(model.id)/publish" class="btn btn-primary">Publish</a>
                                 <a href="/models/#(model.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/models/#(model.id)/delete" class="btn btn-danger">Delete</a>
                                 #endif

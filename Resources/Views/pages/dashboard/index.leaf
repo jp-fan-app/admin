@@ -33,6 +33,7 @@
                             <div class="btn-group" role="group">
                                 <a href="/models/new?manufacturer_id=#(manufacturer.id)" class="btn btn-success">Add Model</a>
                                 #if(isAdmin):
+                                <a href="/manufacturers/#(manufacturer.id)/publish" class="btn btn-primary">Publish</a>
                                 <a href="/manufacturers/#(manufacturer.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/manufacturers/#(manufacturer.id)/delete" class="btn btn-danger">Delete</a>
                                 #endif
@@ -82,6 +83,7 @@
                             <div class="btn-group" role="group">
                                 <a href="/models/#(model.id)/add-stage" class="btn btn-success">Add Stage</a>
                                 #if(isAdmin):
+                                <a href="/models/#(model.id)/publish" class="btn btn-primary">Publish</a>
                                 <a href="/models/#(model.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/models/#(model.id)/delete" class="btn btn-danger">Delete</a>
                                 #endif
@@ -132,6 +134,7 @@
                             <div class="btn-group" role="group">
                                 <a href="/videoSeries/#(videoSerie.id)/add-video" class="btn btn-success">Add Video</a>
                                 #if(isAdmin):
+                                <a href="/videoSeries/#(videoSerie.id)/publish" class="btn btn-primary">Publish</a>
                                 <a href="/videoSeries/#(videoSerie.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/videoSeries/#(videoSerie.id)/delete" class="btn btn-danger">Delete</a>
                                 #endif
@@ -196,6 +199,7 @@
                                 <a href="/models/#(image.carModelID)/images/#(image.id)/upload" class="btn btn-success">Upload</a>
                                 #endif
                                 #if(isAdmin):
+                                <a href="/models/#(image.carModelID)/images/#(image.id)/publish" class="btn btn-primary">Publish</a>
                                 <a href="/models/#(image.carModelID)/images/#(image.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/models/#(image.carModelID)/images/#(image.id)/delete" class="btn btn-danger">Delete</a>
                                 #endif
@@ -207,6 +211,66 @@
             </table>
         </div>
 
+
+
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>Pending Car Stages</h2>
+            </div>
+            <div class="col-lg-6 col-md-12 text-right">
+
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Is Stock</th>
+                        <th>LaSiSe</th>
+                        <th>PS</th>
+                        <th>NM</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #for(stage in context.stageDrafts):
+                    <tr>
+                        <td>
+                            #(stage.id)
+                        </td>
+                        <td>
+                            <a href="/models/#(stage.carModelID)/stages/#(stage.id)">#(stage.name)</a>
+                        </td>
+                        <td>
+                            #(stage.isStock)
+                        </td>
+                        <td>
+                            #(stage.lasiseInSeconds)
+                        </td>
+                        <td>
+                            #(stage.ps)
+                        </td>
+                        <td>
+                            #(stage.nm)
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/models/#(stage.carModelID)/stages/#(stage.id)/add-timing" class="btn btn-success">Add Timing</a>
+                                #if(isAdmin):
+                                <a href="/models/#(stage.carModelID)/stages/#(stage.id)/publish" class="btn btn-primary">Publish</a>
+                                <a href="/models/#(stage.carModelID)/stages/#(stage.id)/edit" class="btn btn-primary">Edit</a>
+                                <a href="/models/#(stage.carModelID)/stages/#(stage.id)/delete" class="btn btn-danger">Delete</a>
+                                #endif
+                            </div>
+                        </td>
+                    </tr>
+                    #endfor
+                </tbody>
+            </table>
+        </div>
 
 
     #endexport

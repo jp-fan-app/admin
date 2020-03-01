@@ -49,6 +49,7 @@
                             <div class="btn-group" role="group">
                                 <a href="/videoSeries/#(videoSerie.id)/add-video" class="btn btn-success">Add Video</a>
                                 #if(isAdmin):
+                                <a href="/videoSeries/#(videoSerie.id)/publish" class="btn btn-primary">Publish</a>
                                 <a href="/videoSeries/#(videoSerie.id)/edit" class="btn btn-primary">Edit</a>
                                 <a href="/videoSeries/#(videoSerie.id)/delete" class="btn btn-danger">Delete</a>
                                 #endif

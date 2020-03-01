@@ -256,6 +256,38 @@ final class ModelController {
         }
     }
 
+    // MARK: - Publish
+
+    struct ModelPublishContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+
+    }
+
+    func publish(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            let context = DefaultContext(.manufacturers,
+                                         ModelPublishContext(model: model),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
+            return req.view.render("pages/models/publish", context).encodeResponse(for: req)
+        }
+    }
+
+    func publishPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().modelsPublish(id: id).map { _ in
+            return req.redirect(to: "/models/\(id)")
+        }
+    }
+
     // MARK: - Add Image
 
     struct AddImageContext: Codable {
@@ -401,5 +433,287 @@ final class ModelController {
         }
     }
 
+    // MARK: - Publish Image
+
+    struct ModelPublishImageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let image: JPFanAppClient.CarImage
+
+    }
+
+    func publishImage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().imagesShow(id: imageID).flatMap { carImage in
+                let context = DefaultContext(.manufacturers,
+                                             ModelPublishImageContext(model: model, image: carImage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/publish-image", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func publishImagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().imagesPublish(id: imageID).map { _ in
+            return req.redirect(to: "/models/\(id)")
+        }
+    }
+
+    // MARK: - Add Stage
+
+    struct AddStageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+
+    }
+
+    struct AddStageForm: Codable {
+
+        let name: String
+        let description: String?
+        let isStock: String?
+        let lasiseInSeconds: String?
+        let ps: String?
+        let nm: String?
+
+    }
+
+    func addStage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            let context = DefaultContext(.manufacturers,
+                                         AddStageContext(model: model),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
+            return req.view.render("pages/models/add-stage", context).encodeResponse(for: req)
+        }
+    }
+
+    func addStagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        let form = try req.content.decode(AddStageForm.self)
+        var laSiSe: Double? = nil
+        if let laSiSeString = form.lasiseInSeconds {
+            laSiSe = Double(laSiSeString)
+        }
+        var ps: Double? = nil
+        if let psString = form.ps {
+            ps = Double(psString)
+        }
+        var nm: Double? = nil
+        if let nmString = form.nm {
+            nm = Double(nmString)
+        }
+        let stage = JPFanAppClient.CarStage(carModelID: id,
+                                            name: form.name,
+                                            description: form.description,
+                                            isStock: form.isStock != nil,
+                                            ps: ps,
+                                            nm: nm,
+                                            lasiseInSeconds: laSiSe)
+        return req.client().stagesCreate(stage: stage).flatMap { carStage in
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+    }
+
+    // MARK: - Edit Stage
+
+    struct EditStageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+        let form: EditStageForm
+
+    }
+
+    struct EditStageForm: Codable {
+
+        let name: String
+        let description: String?
+        let isStock: String?
+        let lasiseInSeconds: String?
+        let ps: String?
+        let nm: String?
+
+    }
+
+    func editStage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                let nf = NumberFormatter()
+                nf.numberStyle = .decimal
+                nf.decimalSeparator = "."
+                nf.maximumFractionDigits = 2
+                var lasise: String? = nil
+                if let lasiseDouble = stage.lasiseInSeconds {
+                    lasise = nf.string(from: NSNumber(value: lasiseDouble))
+                }
+                var ps: String? = nil
+                if let psDouble = stage.ps {
+                    ps = nf.string(from: NSNumber(value: psDouble))
+                }
+                var nm: String? = nil
+                if let nmDouble = stage.nm {
+                    nm = nf.string(from: NSNumber(value: nmDouble))
+                }
+                let form = EditStageForm(name: stage.name,
+                                         description: stage.description,
+                                         isStock: stage.isStock ? "true": "false",
+                                         lasiseInSeconds: lasise,
+                                         ps: ps,
+                                         nm: nm)
+                let context = DefaultContext(.manufacturers,
+                                             EditStageContext(model: model,
+                                                              stage: stage,
+                                                              form: form),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/edit-stage", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func editStagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        let form = try req.content.decode(EditStageForm.self)
+        var laSiSe: Double? = nil
+        if let laSiSeString = form.lasiseInSeconds {
+            laSiSe = Double(laSiSeString)
+        }
+        var ps: Double? = nil
+        if let psString = form.ps {
+            ps = Double(psString)
+        }
+        var nm: Double? = nil
+        if let nmString = form.nm {
+            nm = Double(nmString)
+        }
+        let stage = JPFanAppClient.CarStage(carModelID: id,
+                                            name: form.name,
+                                            description: form.description,
+                                            isStock: form.isStock != nil,
+                                            ps: ps,
+                                            nm: nm,
+                                            lasiseInSeconds: laSiSe)
+        return req.client().stagesPatch(id: stageID, stage: stage).flatMap { carStage in
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+    }
+
+    // MARK: - Delete Stage
+
+    struct ModelDeleteStageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+
+    }
+
+    func deleteStage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                let context = DefaultContext(.manufacturers,
+                                             ModelDeleteStageContext(model: model, stage: stage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/delete-stage", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func deleteStagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().stagesDelete(id: stageID).map { _ in
+            return req.redirect(to: "/models/\(id)")
+        }
+    }
+
+    // MARK: - Publish Stage
+
+    struct ModelPublishStageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+
+    }
+
+    func publishStage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                let context = DefaultContext(.manufacturers,
+                                             ModelPublishStageContext(model: model, stage: stage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/publish-stage", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func publishStagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().stagesPublish(id: stageID).map { _ in
+            return req.redirect(to: "/models/\(id)")
+        }
+    }
 
 }

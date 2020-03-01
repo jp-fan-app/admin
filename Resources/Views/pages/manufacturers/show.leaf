@@ -14,11 +14,16 @@
                 <h2>Details</h2>
             </div>
             <div class="col-lg-6 col-md-12 text-right">
-                <a href="/models/new?manufacturer_id=#(context.manufacturer.id)" class="btn btn-success">Add Model</a>
-                #if(isAdmin):
-                <a href="/manufacturers/#(context.manufacturer.id)/edit" class="btn btn-primary">Edit</a>
-                <a href="/manufacturers/#(context.manufacturer.id)/delete" class="btn btn-danger">Delete</a>
-                #endif
+                <div class="btn-group" role="group">
+                    <a href="/models/new?manufacturer_id=#(context.manufacturer.id)" class="btn btn-success">Add Model</a>
+                    #if(isAdmin && context.manufacturer.isDraft):
+                    <a href="/manufacturers/#(context.manufacturer.id)/publish" class="btn btn-primary">Publish</a>
+                    #endif
+                    #if(isAdmin):
+                    <a href="/manufacturers/#(context.manufacturer.id)/edit" class="btn btn-primary">Edit</a>
+                    <a href="/manufacturers/#(context.manufacturer.id)/delete" class="btn btn-danger">Delete</a>
+                    #endif
+                </div>
             </div>
         </div>
 
@@ -35,6 +40,41 @@
                     </tr>
                 </thead>
                 <tbody>
+                    #if(context.hasDraftModels):
+                    <tr class="table-warning">
+                        <td colspan="4">
+                            Drafts
+                        </td>
+                    </tr>
+                    #for(model in context.draftModels):
+                    <tr>
+                        <td>
+                            #(model.id)
+                        </td>
+                        <td style="width: 200px;">
+                            <img src="https://car-images.jp-fan-app.de/#(model.mainImageID).jpg" class="rounded img-fluid">
+                        </td>
+                        <td>
+                            <a href="/models/#(model.id)">#(model.name)</a>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/models/#(model.id)/add-stage" class="btn btn-success">Add Stage</a>
+                                #if(isAdmin):
+                                <a href="/models/#(model.id)/publish" class="btn btn-primary">Publish</a>
+                                <a href="/models/#(model.id)/edit" class="btn btn-primary">Edit</a>
+                                <a href="/models/#(model.id)/delete" class="btn btn-danger">Delete</a>
+                                #endif
+                            </div>
+                        </td>
+                    </tr>
+                    #endfor
+                    <tr class="table-success">
+                        <td colspan="4">
+                            Production
+                        </td>
+                    </tr>
+                    #endif
                     #for(model in context.models):
                     <tr>
                         <td>
