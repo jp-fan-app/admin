@@ -13,16 +13,26 @@
             <div class="col-lg-6 col-md-12">
                 <h2>Details</h2>
 
-                #(context.model.name)<br>
-                #(context.model.manufacturerID)<br>
-                #(context.model.transmissionType)<br>
-                #(context.model.axleType)<br>
+                <div class="media">
+                    <img src="https://car-images.jp-fan-app.de/#(context.model.mainImageID).jpg" class="mr-3 rounded img-fluid" alt="Main Image">
+                    <div class="media-body">
+                        <h5 class="mt-0">#(context.manufacturer.name) #(context.model.name)</h5>
+                        Transmission: #(context.modelDetails.transmissionType)<br>
+                        Axle Type: #(context.modelDetails.axleType)<br>
+                    </div>
+                </div>
+
+                <br>
+                <br>
+
             </div>
             <div class="col-lg-6 col-md-12 text-right">
-                #if(isAdmin):
-                <a href="/models/#(context.model.id)/edit" class="btn btn-primary">Edit</a>
-                <a href="/models/#(context.model.id)/delete" class="btn btn-danger">Delete</a>
-                #endif
+                <div class="btn-group" role="group">
+                    #if(isAdmin):
+                    <a href="/models/#(context.model.id)/edit" class="btn btn-primary">Edit</a>
+                    <a href="/models/#(context.model.id)/delete" class="btn btn-danger">Delete</a>
+                    #endif
+                </div>
             </div>
         </div>
 
@@ -33,7 +43,7 @@
                         <h3>Stages</h3>
                     </div>
                     <div class="col-lg-6 col-md-12 text-right">
-                        <a href="/models/#(model.id)/add-stage" class="btn btn-success">New Stage</a>
+                        <a href="/models/#(context.model.id)/add-stage" class="btn btn-success">New Stage</a>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -46,6 +56,37 @@
                             </tr>
                         </thead>
                         <tbody>
+                            #if(context.hasDraftStages):
+                            <tr class="table-warning">
+                                <td colspan="3">
+                                    Drafts
+                                </td>
+                            </tr>
+                            #for(stage in context.draftStages):
+                            <tr>
+                                <td>
+                                    #(stage.id)
+                                </td>
+                                <td>
+                                    <a href="/models/#(context.model.id)/stage/#(stage.id)">#(stage.name)</a>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/add-timing" class="btn btn-success">Add Timing</a>
+                                        #if(isAdmin):
+                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(context.model.id)/stage/#(stage.id)/delete" class="btn btn-danger">Delete</a>
+                                        #endif
+                                    </div>
+                                </td>
+                            </tr>
+                            #endfor
+                            <tr class="table-success">
+                                <td colspan="3">
+                                    Production
+                                </td>
+                            </tr>
+                            #endif
                             #for(stage in context.stages):
                             <tr>
                                 <td>
@@ -75,7 +116,7 @@
                         <h3>Images</h3>
                     </div>
                     <div class="col-lg-6 col-md-12 text-right">
-                        <a href="/models/#(model.id)/add-image" class="btn btn-success">New Image</a>
+                        <a href="/models/#(context.model.id)/add-image" class="btn btn-success">New Image</a>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -89,18 +130,79 @@
                             </tr>
                         </thead>
                         <tbody>
+                            #if(context.hasDraftImages):
+                            <tr class="table-warning">
+                                <td colspan="4">
+                                    Drafts
+                                </td>
+                            </tr>
+                            #for(image in context.draftImages):
+                            <tr>
+                                <td>
+                                    #(image.id)
+                                </td>
+                                <td style="width: 200px;">
+                                #if(image.hasUpload):
+                                    <img src="https://car-images.jp-fan-app.de/#(image.id).jpg" class="rounded img-fluid">
+                                #else:
+                                    No Upload
+                                #endif
+                                </td>
+                                <td>
+                                #if(image.hasUpload):
+                                    <a href="https://car-images.jp-fan-app.de/#(image.id).jpg">https://car-images.jp-fan-app.de/#(image.id).jpg</a>
+                                #else:
+                                    No Upload
+                                #endif
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        #if(isAdmin || image.isDraft):
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/upload-image" class="btn btn-success">Upload</a>
+                                        #endif
+                                        #if(isAdmin):
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/delete" class="btn btn-danger">Delete</a>
+                                        #endif
+                                    </div>
+                                </td>
+                            </tr>
+                            #endfor
+                            <tr class="table-success">
+                                <td colspan="4">
+                                    Production
+                                </td>
+                            </tr>
+                            #endif
                             #for(image in context.images):
                             <tr>
                                 <td>
                                     #(image.id)
                                 </td>
                                 <td style="width: 200px;">
+                                #if(image.hasUpload):
                                     <img src="https://car-images.jp-fan-app.de/#(image.id).jpg" class="rounded img-fluid">
+                                #else:
+                                    No Upload
+                                #endif
                                 </td>
                                 <td>
+                                #if(image.hasUpload):
                                     <a href="https://car-images.jp-fan-app.de/#(image.id).jpg">https://car-images.jp-fan-app.de/#(image.id).jpg</a>
+                                #else:
+                                    No Upload
+                                #endif
                                 </td>
                                 <td>
+                                    <div class="btn-group" role="group">
+                                        #if(isAdmin || image.isDraft):
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/upload" class="btn btn-success">Upload</a>
+                                        #endif
+                                        #if(isAdmin):
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/edit" class="btn btn-primary">Edit</a>
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/delete" class="btn btn-danger">Delete</a>
+                                        #endif
+                                    </div>
                                 </td>
                             </tr>
                             #endfor

@@ -41,9 +41,39 @@ final class ModelController {
 
     struct ModelShowContext: Codable {
 
-        var model: JPFanAppClient.CarModel
-        var stages: [JPFanAppClient.CarStage]
-        var images: [JPFanAppClient.CarImage]
+        struct ModelDetails: Codable {
+
+            let transmissionType: String
+            let axleType: String
+
+            static func from(model: JPFanAppClient.CarModel) -> ModelDetails {
+                let transmission: String
+                switch model.transmissionType {
+                case .automatic: transmission = "Automatic"
+                case .manual: transmission = "Manual"
+                }
+
+                let axleType: String
+                switch model.axleType {
+                case .all: axleType = "All"
+                case .front: axleType = "Front"
+                case .rear: axleType = "Rear"
+                }
+
+                return ModelDetails(transmissionType: transmission, axleType: axleType)
+            }
+
+        }
+
+        let model: JPFanAppClient.CarModel
+        let modelDetails: ModelDetails
+        let manufacturer: JPFanAppClient.ManufacturerModel
+        let stages: [JPFanAppClient.CarStage]
+        let hasDraftStages: Bool
+        let draftStages: [JPFanAppClient.CarStage]
+        let images: [JPFanAppClient.CarImage]
+        let hasDraftImages: Bool
+        let draftImages: [JPFanAppClient.CarImage]
 
     }
 
@@ -53,15 +83,27 @@ final class ModelController {
         }
 
         return req.client().modelsShow(id: id).flatMap { model in
-            req.client().modelsStages(id: id).flatMap { stages in
-                req.client().modelsImages(id: id).flatMap { images in
-                    let context = DefaultContext(.models,
-                                                 ModelShowContext(model: model,
-                                                                  stages: stages,
-                                                                  images: images),
-                                                 isAdmin: req.isAdmin(),
-                                                 username: req.username())
-                    return req.view.render("pages/models/show", context).encodeResponse(for: req)
+            return req.client().manufacturersShow(id: model.manufacturerID).flatMap { manufacturer in
+                return req.client().modelsStages(id: id).flatMap { stages in
+                    return req.client().modelsStagesDraft(id: id).flatMap { draftStages in
+                        return req.client().modelsImages(id: id).flatMap { images in
+                            return req.client().modelsImagesDraft(id: id).flatMap { draftImages in
+                                let context = DefaultContext(.models,
+                                                             ModelShowContext(model: model,
+                                                                              modelDetails: .from(model: model),
+                                                                              manufacturer: manufacturer,
+                                                                              stages: stages,
+                                                                              hasDraftStages: draftStages.count > 0,
+                                                                              draftStages: draftStages,
+                                                                              images: images,
+                                                                              hasDraftImages: draftImages.count > 0,
+                                                                              draftImages: draftImages),
+                                                             isAdmin: req.isAdmin(),
+                                                             username: req.username())
+                                return req.view.render("pages/models/show", context).encodeResponse(for: req)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -88,7 +130,7 @@ final class ModelController {
 
     struct ModelNewFlags: Content {
 
-         var manufacturer_id: Int?
+         let manufacturer_id: Int?
 
     }
 
@@ -186,7 +228,7 @@ final class ModelController {
 
     struct ModelDeleteContext: Codable {
 
-        var model: JPFanAppClient.CarModel
+        let model: JPFanAppClient.CarModel
 
     }
 
@@ -213,5 +255,151 @@ final class ModelController {
             return req.redirect(to: "/models")
         }
     }
+
+    // MARK: - Add Image
+
+    struct AddImageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+
+    }
+
+    struct AddImageForm: Codable {
+
+        let copyrightInformation: String
+        var file: File
+
+    }
+
+    func addImage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            let context = DefaultContext(.manufacturers,
+                                         AddImageContext(model: model),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
+            return req.view.render("pages/models/add-image", context).encodeResponse(for: req)
+        }
+    }
+
+    func addImagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        var form = try req.content.decode(AddImageForm.self)
+        guard form.file.contentType == .some(.jpeg) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/add-image"))
+        }
+
+        let image = JPFanAppClient.CarImage(carModelID: id, copyrightInformation: form.copyrightInformation)
+        return req.client().imagesCreate(image: image).flatMap { carImage in
+            guard let imageID = carImage.id else {
+                return req.eventLoop.future(req.redirect(to: "/models/\(id)/add-image"))
+            }
+            let data = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
+            return req.client().imagesUpload(id: imageID, imageData: data).flatMap { _ in
+                return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+            }
+        }
+    }
+
+    // MARK: - Upload Image
+
+    struct UploadImageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let image: JPFanAppClient.CarImage
+
+    }
+
+    struct UploadImageForm: Codable {
+
+        var file: File
+
+    }
+
+    func uploadImage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().imagesShow(id: imageID).flatMap { carImage in
+                let context = DefaultContext(.manufacturers,
+                                             UploadImageContext(model: model, image: carImage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/upload-image", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func uploadImagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        var form = try req.content.decode(UploadImageForm.self)
+        guard form.file.contentType == .some(.jpeg) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/images/\(imageID)/upload-image"))
+        }
+
+        let data = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
+        return req.client().imagesUpload(id: imageID, imageData: data).flatMap { _ in
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+    }
+
+    // MARK: - Delete Image
+
+    struct ModelDeleteImageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let image: JPFanAppClient.CarImage
+
+    }
+
+    func deleteImage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().imagesShow(id: imageID).flatMap { carImage in
+                let context = DefaultContext(.manufacturers,
+                                             ModelDeleteImageContext(model: model, image: carImage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/delete-image", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func deleteImagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().imagesDelete(id: imageID).map { _ in
+            return req.redirect(to: "/models/\(id)")
+        }
+    }
+
 
 }

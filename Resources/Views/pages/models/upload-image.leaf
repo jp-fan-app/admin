@@ -1,0 +1,28 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
+                <li class="breadcrumb-item">Images</li>
+                <li class="breadcrumb-item">#(context.image.id)</li>
+                <li class="breadcrumb-item active">Upload Image</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-6">
+                <form method="POST" enctype="multipart/form-data">
+                  <div class="form-group">
+                    <label for="name">File</label>
+                    <input type="file" class="form-control-file" id="file" name="file" required="" aria-describedby="name-help">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

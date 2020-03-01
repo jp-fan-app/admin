@@ -14,11 +14,13 @@
                 <h2>Details</h2>
             </div>
             <div class="col-lg-6 col-md-12 text-right">
-                <a href="/videoSeries/#(context.videoSerie.id)/add-video" class="btn btn-success">Add Video</a>
-                #if(isAdmin):
-                <a href="/videoSeries/#(context.videoSerie.id)/edit" class="btn btn-primary">Edit</a>
-                <a href="/videoSeries/#(context.videoSerie.id)/delete" class="btn btn-danger">Delete</a>
-                #endif
+                <div class="btn-group" role="group">
+                    <a href="/videoSeries/#(context.videoSerie.id)/add-video" class="btn btn-success">Add Video</a>
+                    #if(isAdmin):
+                    <a href="/videoSeries/#(context.videoSerie.id)/edit" class="btn btn-primary">Edit</a>
+                    <a href="/videoSeries/#(context.videoSerie.id)/delete" class="btn btn-danger">Delete</a>
+                    #endif
+                </div>
             </div>
         </div>
 

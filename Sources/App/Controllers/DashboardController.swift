@@ -18,6 +18,7 @@ final class DashboardController {
         let manufacturerDrafts: [JPFanAppClient.ManufacturerModel]
         let modelDrafts: [JPFanAppClient.CarModel]
         let videoSerieDrafts: [JPFanAppClient.VideoSerie]
+        let imageDrafts: [JPFanAppClient.CarImage]
 
     }
 
@@ -25,13 +26,16 @@ final class DashboardController {
         return req.client().manufacturersIndexDraft().flatMap { manufacturerDrafts in
             return req.client().modelsIndexDraft().flatMap { modelDrafts in
                 return req.client().videoSeriesIndexDraft().flatMap { videoSerieDrafts in
-                    return req.view.render("pages/dashboard/index",
-                    DefaultContext(.dashboard,
-                                   DashboardIndexContext(manufacturerDrafts: manufacturerDrafts,
-                                                         modelDrafts: modelDrafts,
-                                                         videoSerieDrafts: videoSerieDrafts),
-                                   isAdmin: req.isAdmin(),
-                                   username: req.username()))
+                    return req.client().imagesIndexDraft().flatMap { imageDrafts in
+                        let context = DefaultContext(.dashboard,
+                                                     DashboardIndexContext(manufacturerDrafts: manufacturerDrafts,
+                                                                           modelDrafts: modelDrafts,
+                                                                           videoSerieDrafts: videoSerieDrafts,
+                                                                           imageDrafts: imageDrafts),
+                                                     isAdmin: req.isAdmin(),
+                                                     username: req.username())
+                        return req.view.render("pages/dashboard/index", context)
+                    }
                 }
             }
         }

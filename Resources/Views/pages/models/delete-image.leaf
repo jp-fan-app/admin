@@ -1,0 +1,26 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/models">Models</a></li>
+                <li class="breadcrumb-item"><a href="/models/#(context.model.id)">#(context.model.name)</a></li>
+                <li class="breadcrumb-item">Images</li>
+                <li class="breadcrumb-item">#(context.image.id)</li>
+                <li class="breadcrumb-item active">Delete</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-6">
+                <form method="POST">
+                    <h2>Confirmation</h2>
+                    <p>Do you really want to delete image <b>#(context.image.id)</b> from <b>#(context.model.name)</b></p>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

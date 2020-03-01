@@ -47,6 +47,12 @@ func routes(_ app: Application) throws {
         admin.post("models", ":id", "edit", use: modelController.update)
         admin.get("models", ":id", "delete", use: modelController.delete)
         admin.post("models", ":id", "delete", use: modelController.deletePOST)
+        router.get("models", ":id", "add-image", use: modelController.addImage)
+        router.post("models", ":id", "add-image", use: modelController.addImagePOST)
+        router.get("models", ":id", "images", ":imageID", "upload-image", use: modelController.uploadImage)
+        router.post("models", ":id", "images", ":imageID","upload-image", use: modelController.uploadImagePOST)
+        admin.get("models", ":id", "images", ":imageID", "delete", use: modelController.deleteImage)
+        admin.post("models", ":id", "images", ":imageID", "delete", use: modelController.deleteImagePOST)
 
         router.get("videos", use: { try defaultController.view($0, view: "pages/videos", page: .videos) })
 
@@ -60,7 +66,8 @@ func routes(_ app: Application) throws {
         admin.get("videoSeries", ":id", "delete", use: videoSeriesController.delete)
         admin.post("videoSeries", ":id", "delete", use: videoSeriesController.deletePOST)
 
-        admin.get("devices", use: { try defaultController.view($0, view: "pages/devices", page: .devices) })
+        let devicesController = DevicesController()
+        admin.get("devices", use: devicesController.index)
 
         let userController = UserController()
         admin.get("users", use: userController.index)
