@@ -1,0 +1,27 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/videoSeries">Video Series</a></li>
+                <li class="breadcrumb-item">#(context.videoSerie.title)</li>
+                <li class="breadcrumb-item active">Add Video</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-6">
+                <form method="POST">
+                  <div class="form-group">
+                    <label for="videoID">Video ID</label>
+                    <input type="text" class="form-control" id="videoID" name="videoID" required="" aria-describedby="videoID-help" value="#(context.form.videoID)">
+                    <br>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Add Video</button>
+                </form>
+            </div>
+        </div>
+
+    #endexport
+#endextend

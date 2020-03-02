@@ -26,8 +26,9 @@ final class VideoSeriesController {
     func index(_ req: Request) throws -> EventLoopFuture<View> {
         return req.client().videoSeriesIndex().flatMap { videoSeries in
             return req.client().videoSeriesIndexDraft().flatMap { drafts in
+                let sortedVideoSeries = videoSeries.sorted(by: { $0.updatedAt ?? Date() > $1.updatedAt ?? Date() })
                 let context = DefaultContext(.videoSeries,
-                                             VideoSerieIndexContext(videoSeries: videoSeries,
+                                             VideoSerieIndexContext(videoSeries: sortedVideoSeries,
                                                                     hasDrafts: drafts.count > 0,
                                                                     drafts: drafts),
                                              isAdmin: req.isAdmin(),
@@ -43,6 +44,8 @@ final class VideoSeriesController {
 
         let videoSerie: JPFanAppClient.VideoSerie
         let videos: [JPFanAppClient.VideoSerieYoutubeVideo]
+        let hasVideoDrafts: Bool
+        let videoDrafts: [JPFanAppClient.VideoSerieYoutubeVideo]
 
     }
 
@@ -52,13 +55,17 @@ final class VideoSeriesController {
         }
 
         return req.client().videoSeriesShow(id: id).flatMap { videoSerie in
-            req.client().videoSeriesVideos(id: id).flatMap { videos in
-                let context = DefaultContext(.videoSeries,
-                                             VideoSerieShowContext(videoSerie: videoSerie,
-                                                                   videos: videos),
-                                             isAdmin: req.isAdmin(),
-                                             username: req.username())
-                return req.view.render("pages/videoSeries/show", context).encodeResponse(for: req)
+            return req.client().videoSeriesVideos(id: id).flatMap { videos in
+                return req.client().videoSeriesVideosDraft(id: id).flatMap { videoDrafts in
+                    let context = DefaultContext(.videoSeries,
+                                                 VideoSerieShowContext(videoSerie: videoSerie,
+                                                                       videos: videos,
+                                                                       hasVideoDrafts: videoDrafts.count > 0,
+                                                                       videoDrafts: videoDrafts),
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
+                    return req.view.render("pages/videoSeries/show", context).encodeResponse(for: req)
+                }
             }
         }
     }
@@ -210,6 +217,132 @@ final class VideoSeriesController {
         }
 
         return req.client().videoSeriesPublish(id: id).map { _ in
+            return req.redirect(to: "/videoSeries/\(id)")
+        }
+    }
+
+    // MARK: - Add Video
+
+    struct AddVideoContext: Codable {
+
+        var videoSerie: JPFanAppClient.VideoSerie
+
+    }
+
+    struct AddVideoForm: Codable {
+
+        let videoID: String
+
+    }
+
+    func addVideo(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+
+        return req.client().videoSeriesShow(id: id).flatMap { videoSerie in
+            let context = DefaultContext(.manufacturers,
+                                         AddVideoContext(videoSerie: videoSerie),
+                                         isAdmin: req.isAdmin(),
+                                         username: req.username())
+            return req.view.render("pages/videoSeries/videos/add", context).encodeResponse(for: req)
+        }
+    }
+
+    func addVideoPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+
+        let form = try req.content.decode(AddVideoForm.self)
+        return req.client().videosShow(videoID: form.videoID).flatMap { videos in
+            guard let videoID = videos.first?.id else {
+                return req.eventLoop.future(req.redirect(to: "/videoSeries/\(id)/"))
+            }
+            return req.client().videoSeriesVideosAdd(id: id, videoID: videoID).flatMap { _ in
+                return req.eventLoop.future(req.redirect(to: "/videoSeries/\(id)/"))
+            }
+        }
+    }
+
+    // MARK: - Delete Video
+
+    struct VideoSerieDeleteVideoContext: Codable {
+
+        var videoSerie: JPFanAppClient.VideoSerie
+        let video: JPFanAppClient.YoutubeVideo
+
+    }
+
+    func deleteVideo(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries/\(id)"))
+        }
+
+        return req.client().videoSeriesShow(id: id).flatMap { videoSerie in
+            return req.client().videosShow(id: videoID).flatMap { video in
+                let context = DefaultContext(.manufacturers,
+                                             VideoSerieDeleteVideoContext(videoSerie: videoSerie, video: video),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/videoSeries/videos/delete", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func deleteVideoPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries/\(id)"))
+        }
+
+        return req.client().videoSeriesVideosRemove(id: id, videoID: videoID).map { _ in
+            return req.redirect(to: "/videoSeries/\(id)")
+        }
+    }
+
+    // MARK: - Publish Video
+
+    struct VideoSeriePublishVideoContext: Codable {
+
+        var videoSerie: JPFanAppClient.VideoSerie
+        let video: JPFanAppClient.YoutubeVideo
+
+    }
+
+    func publishVideo(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries/\(id)"))
+        }
+
+        return req.client().videoSeriesShow(id: id).flatMap { videoSerie in
+            return req.client().videosShow(id: videoID).flatMap { video in
+                let context = DefaultContext(.manufacturers,
+                                             VideoSeriePublishVideoContext(videoSerie: videoSerie, video: video),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/videoSeries/videos/publish", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func publishVideoPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/videoSeries/\(id)"))
+        }
+
+        return req.client().videoSeriesVideosPublish(id: id, videoID: videoID).map { _ in
             return req.redirect(to: "/videoSeries/\(id)")
         }
     }

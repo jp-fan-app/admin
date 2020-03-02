@@ -16,6 +16,9 @@
             <div class="col-lg-6 col-md-12 text-right">
                 <div class="btn-group" role="group">
                     <a href="/videoSeries/#(context.videoSerie.id)/add-video" class="btn btn-success">Add Video</a>
+                    #if(isAdmin && context.videoSerie.isDraft):
+                    <a href="/videoSeries/#(context.videoSerie.id)/publish" class="btn btn-primary">Publish</a>
+                    #endif
                     #if(isAdmin):
                     <a href="/videoSeries/#(context.videoSerie.id)/edit" class="btn btn-primary">Edit</a>
                     <a href="/videoSeries/#(context.videoSerie.id)/delete" class="btn btn-danger">Delete</a>
@@ -41,6 +44,49 @@
                     </tr>
                 </thead>
                 <tbody>
+                    #if(context.hasVideoDrafts):
+                    <tr class="table-warning">
+                        <td colspan="7">
+                            Drafts
+                        </td>
+                    </tr>
+                    #for(serieVideo in context.videoDrafts):
+                    <tr>
+                        <td>
+                            #(serieVideo.video.id)
+                        </td>
+                        <td style="width: 200px;">
+                            <img src="#(serieVideo.video.thumbnailURL)" class="rounded img-fluid">
+                        </td>
+                        <td>
+                            #(serieVideo.video.title)
+                        </td>
+                        <td>
+                            #(serieVideo.video.description)
+                        </td>
+                        <td>
+                            #(serieVideo.video.publishedAt)
+                        </td>
+                        <td>
+                            <a href="https://youtube.com/watch?v=#(serieVideo.video.videoID)">https://youtube.com/watch?v=#(serieVideo.video.videoID)</a>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                #if(isAdmin):
+                                <a href="/videoSeries/#(context.videoSerie.id)/videos/#(serieVideo.video.id)/publish" class="btn btn-primary">Publish</a>
+                                <a href="/videoSeries/#(context.videoSerie.id)/videos/#(serieVideo.video.id)/edit" class="btn btn-primary">Edit</a>
+                                <a href="/videoSeries/#(context.videoSerie.id)/videos/#(serieVideo.video.id)/delete" class="btn btn-danger">Delete</a>
+                                #endif
+                            </div>
+                        </td>
+                    </tr>
+                    #endfor
+                    <tr class="table-success">
+                        <td colspan="7">
+                            Production
+                        </td>
+                    </tr>
+                    #endif
                     #for(serieVideo in context.videos):
                     <tr>
                         <td>

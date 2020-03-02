@@ -101,6 +101,13 @@ func routes(_ app: Application) throws {
         admin.post("videoSeries", ":id", "delete", use: videoSeriesController.deletePOST)
         admin.get("videoSeries", ":id", "publish", use: videoSeriesController.publish)
         admin.post("videoSeries", ":id", "publish", use: videoSeriesController.publishPOST)
+        // Videos
+        router.get("videoSeries", ":id", "add-video", use: videoSeriesController.addVideo)
+        router.post("videoSeries", ":id", "add-video", use: videoSeriesController.addVideoPOST)
+        router.get("videoSeries", ":id", "videos", ":videoID", "delete", use: videoSeriesController.deleteVideo)
+        router.post("videoSeries", ":id", "videos", ":videoID", "delete", use: videoSeriesController.deleteVideoPOST)
+        router.get("videoSeries", ":id", "videos", ":videoID", "publish", use: videoSeriesController.publishVideo)
+        router.post("videoSeries", ":id", "videos", ":videoID", "publish", use: videoSeriesController.publishVideoPOST)
 
         let devicesController = DevicesController()
         admin.get("devices", use: devicesController.index)
