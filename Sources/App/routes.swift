@@ -80,6 +80,13 @@ func routes(_ app: Application) throws {
         router.get("models", ":id", "stages", ":stageID", "timings", ":timingID", "publish", use: modelController.publishTiming)
         router.post("models", ":id", "stages", ":stageID", "timings", ":timingID", "publish", use: modelController.publishTimingPOST)
         router.get("timings", ":id", "find", use: modelController.findTiming)
+        // Stage Videos
+        router.get("models", ":id", "stages", ":stageID", "add-video", use: modelController.addVideo)
+        router.post("models", ":id", "stages", ":stageID", "add-video", use: modelController.addVideoPOST)
+        router.get("models", ":id", "stages", ":stageID", "videos", ":videoID", "delete", use: modelController.deleteVideo)
+        router.post("models", ":id", "stages", ":stageID", "videos", ":videoID", "delete", use: modelController.deleteVideoPOST)
+        router.get("models", ":id", "stages", ":stageID", "videos", ":videoID", "publish", use: modelController.publishVideo)
+        router.post("models", ":id", "stages", ":stageID", "videos", ":videoID", "publish", use: modelController.publishVideoPOST)
 
         router.get("videos", use: { try defaultController.view($0, view: "pages/videos", page: .videos) })
 

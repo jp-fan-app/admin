@@ -313,7 +313,7 @@ final class ModelController {
                                          AddImageContext(model: model),
                                          isAdmin: req.isAdmin(),
                                          username: req.username())
-            return req.view.render("pages/models/add-image", context).encodeResponse(for: req)
+            return req.view.render("pages/models/images/add", context).encodeResponse(for: req)
         }
     }
 
@@ -368,7 +368,7 @@ final class ModelController {
                                              UploadImageContext(model: model, image: carImage),
                                              isAdmin: req.isAdmin(),
                                              username: req.username())
-                return req.view.render("pages/models/upload-image", context).encodeResponse(for: req)
+                return req.view.render("pages/models/images/upload", context).encodeResponse(for: req)
             }
         }
     }
@@ -415,7 +415,7 @@ final class ModelController {
                                              ModelDeleteImageContext(model: model, image: carImage),
                                              isAdmin: req.isAdmin(),
                                              username: req.username())
-                return req.view.render("pages/models/delete-image", context).encodeResponse(for: req)
+                return req.view.render("pages/models/images/delete", context).encodeResponse(for: req)
             }
         }
     }
@@ -456,7 +456,7 @@ final class ModelController {
                                              ModelPublishImageContext(model: model, image: carImage),
                                              isAdmin: req.isAdmin(),
                                              username: req.username())
-                return req.view.render("pages/models/publish-image", context).encodeResponse(for: req)
+                return req.view.render("pages/models/images/publish", context).encodeResponse(for: req)
             }
         }
     }
@@ -503,7 +503,7 @@ final class ModelController {
                                          AddStageContext(model: model),
                                          isAdmin: req.isAdmin(),
                                          username: req.username())
-            return req.view.render("pages/models/add-stage", context).encodeResponse(for: req)
+            return req.view.render("pages/models/stages/add", context).encodeResponse(for: req)
         }
     }
 
@@ -546,6 +546,9 @@ final class ModelController {
         let timings: [JPFanAppClient.StageTiming]
         let hasDraftTimings: Bool
         let draftTimings: [JPFanAppClient.StageTiming]
+        let videos: [JPFanAppClient.YoutubeVideo]
+        let hasDraftVideos: Bool
+        let draftVideos: [JPFanAppClient.YoutubeVideo]
 
     }
 
@@ -561,15 +564,22 @@ final class ModelController {
             return req.client().stagesShow(id: stageID).flatMap { stage in
                 return req.client().stagesTimings(id: stageID).flatMap { timings in
                     return req.client().stagesTimingsDraft(id: stageID).flatMap { draftTimings in
-                        let context = DefaultContext(.manufacturers,
-                                                     ShowStageContext(model: model,
-                                                                      stage: stage,
-                                                                      timings: timings,
-                                                                      hasDraftTimings: draftTimings.count > 0,
-                                                                      draftTimings: draftTimings),
-                                                     isAdmin: req.isAdmin(),
-                                                     username: req.username())
-                        return req.view.render("pages/models/stage", context).encodeResponse(for: req)
+                        return req.client().stagesVideos(id: stageID).flatMap { videos in
+                            return req.client().stagesVideosDraft(id: stageID).flatMap { draftVideos in
+                                let context = DefaultContext(.manufacturers,
+                                                             ShowStageContext(model: model,
+                                                                              stage: stage,
+                                                                              timings: timings,
+                                                                              hasDraftTimings: draftTimings.count > 0,
+                                                                              draftTimings: draftTimings,
+                                                                              videos: videos,
+                                                                              hasDraftVideos: draftVideos.count > 0,
+                                                                              draftVideos: draftVideos),
+                                                             isAdmin: req.isAdmin(),
+                                                             username: req.username())
+                                return req.view.render("pages/models/stages/show", context).encodeResponse(for: req)
+                            }
+                        }
                     }
                 }
             }
@@ -635,7 +645,7 @@ final class ModelController {
                                                               form: form),
                                              isAdmin: req.isAdmin(),
                                              username: req.username())
-                return req.view.render("pages/models/edit-stage", context).encodeResponse(for: req)
+                return req.view.render("pages/models/stages/edit", context).encodeResponse(for: req)
             }
         }
     }
@@ -696,7 +706,7 @@ final class ModelController {
                                              ModelDeleteStageContext(model: model, stage: stage),
                                              isAdmin: req.isAdmin(),
                                              username: req.username())
-                return req.view.render("pages/models/delete-stage", context).encodeResponse(for: req)
+                return req.view.render("pages/models/stages/delete", context).encodeResponse(for: req)
             }
         }
     }
@@ -737,7 +747,7 @@ final class ModelController {
                                              ModelPublishStageContext(model: model, stage: stage),
                                              isAdmin: req.isAdmin(),
                                              username: req.username())
-                return req.view.render("pages/models/publish-stage", context).encodeResponse(for: req)
+                return req.view.render("pages/models/stages/publish", context).encodeResponse(for: req)
             }
         }
     }
@@ -787,7 +797,7 @@ final class ModelController {
                                              AddTimingContext(model: model, stage: stage),
                                              isAdmin: req.isAdmin(),
                                              username: req.username())
-                return req.view.render("pages/models/add-timing", context).encodeResponse(for: req)
+                return req.view.render("pages/models/timings/add", context).encodeResponse(for: req)
             }
         }
     }
@@ -878,7 +888,7 @@ final class ModelController {
                                                  EditTimingContext(model: model, stage: stage, timing: timing, form: form),
                                                  isAdmin: req.isAdmin(),
                                                  username: req.username())
-                    return req.view.render("pages/models/edit-timing", context).encodeResponse(for: req)
+                    return req.view.render("pages/models/timings/edit", context).encodeResponse(for: req)
                 }
             }
         }
@@ -944,7 +954,7 @@ final class ModelController {
                                                  ModelDeleteTimingContext(model: model, stage: stage, timing: timing),
                                                  isAdmin: req.isAdmin(),
                                                  username: req.username())
-                    return req.view.render("pages/models/delete-timing", context).encodeResponse(for: req)
+                    return req.view.render("pages/models/timings/delete", context).encodeResponse(for: req)
                 }
             }
         }
@@ -1015,7 +1025,7 @@ final class ModelController {
                                                  ModelPublishTimingContext(model: model, stage: stage, timing: timing),
                                                  isAdmin: req.isAdmin(),
                                                  username: req.username())
-                    return req.view.render("pages/models/publish-timing", context).encodeResponse(for: req)
+                    return req.view.render("pages/models/timings/publish", context).encodeResponse(for: req)
                 }
             }
         }
@@ -1037,5 +1047,157 @@ final class ModelController {
         }
     }
 
+    // MARK: - Add Video
+
+    struct AddVideoContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+
+    }
+
+    struct AddVideoForm: Codable {
+
+        let videoID: String
+
+    }
+
+    func addVideo(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                let context = DefaultContext(.manufacturers,
+                                             AddVideoContext(model: model, stage: stage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/videos/add", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func addVideoPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        let form = try req.content.decode(AddVideoForm.self)
+        return req.client().videosShow(videoID: form.videoID).flatMap { videos in
+            guard let videoID = videos.first?.id else {
+                return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+            }
+            return req.client().stagesVideosAdd(id: stageID, videoID: videoID).flatMap { _ in
+                return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+            }
+        }
+    }
+
+    // MARK: - Delete Video
+
+    struct ModelDeleteVideoContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+        let video: JPFanAppClient.YoutubeVideo
+
+    }
+
+    func deleteVideo(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                return req.client().videosShow(id: videoID).flatMap { video in
+                    let context = DefaultContext(.manufacturers,
+                                                 ModelDeleteVideoContext(model: model, stage: stage, video: video),
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
+                    return req.view.render("pages/models/videos/delete", context).encodeResponse(for: req)
+                }
+            }
+        }
+    }
+
+    func deleteVideoPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().stagesVideosRemove(id: stageID, videoID: videoID).map { _ in
+            return req.redirect(to: "/models/\(id)/stages/\(stageID)")
+        }
+    }
+
+    // MARK: - Publish Video
+
+    struct ModelPublishVideoContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let stage: JPFanAppClient.CarStage
+        let video: JPFanAppClient.YoutubeVideo
+
+    }
+
+    func publishVideo(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().stagesShow(id: stageID).flatMap { stage in
+                return req.client().videosShow(id: videoID).flatMap { video in
+                    let context = DefaultContext(.manufacturers,
+                                                 ModelPublishVideoContext(model: model, stage: stage, video: video),
+                                                 isAdmin: req.isAdmin(),
+                                                 username: req.username())
+                    return req.view.render("pages/models/videos/publish", context).encodeResponse(for: req)
+                }
+            }
+        }
+    }
+
+    func publishVideoPOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let stageID = req.parameters.get("stageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+        guard let videoID = req.parameters.get("videoID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/stages/\(stageID)"))
+        }
+
+        return req.client().stagesVideosPublish(id: stageID, videoID: videoID).map { _ in
+            return req.redirect(to: "/models/\(id)/stages/\(stageID)")
+        }
+    }
 
 }
