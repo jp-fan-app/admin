@@ -21,6 +21,10 @@
                     <label for="description">Description</label>
                     <input type="text" class="form-control" id="description" name="description" aria-describedby="description-help" value="#(context.form.description)">
                   </div>
+                  <div class="form-group">
+                    <label for="isPublis">Is Public</label>
+                    <input type="checkbox" class="form-control" id="isPublic" name="isPublic" aria-describedby="isPublic-help" value="checked" #if(context.form.isPublic): checked="checked" #endif>
+                  </div>
                   <button type="submit" class="btn btn-primary">Update</button>
                 </form>
             </div>
