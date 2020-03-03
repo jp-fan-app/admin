@@ -21,6 +21,11 @@
                   </div>
                   <button type="submit" class="btn btn-primary">Add Video</button>
                 </form>
+                <br>
+                or
+                <br>
+                <br>
+                <a href="/videos/find?addToStageID=#(context.stage.id)" class="btn btn-info">Find Video</a>
             </div>
         </div>
 

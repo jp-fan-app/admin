@@ -229,7 +229,13 @@ final class VideoSeriesController {
 
     }
 
-    struct AddVideoForm: Codable {
+    struct AddVideoForm: Content {
+
+        let videoID: String
+
+    }
+
+    struct AddVideoFlags: Content {
 
         let videoID: String
 
@@ -238,6 +244,11 @@ final class VideoSeriesController {
     func addVideo(_ req: Request) throws -> EventLoopFuture<Response> {
         guard let id = req.parameters.get("id", as: Int.self) else {
             return req.eventLoop.future(req.redirect(to: "/videoSeries"))
+        }
+
+        if let flags = try? req.query.decode(AddVideoFlags.self) {
+            try req.content.encode(AddVideoForm(videoID: flags.videoID))
+            return try addVideoPOST(req)
         }
 
         return req.client().videoSeriesShow(id: id).flatMap { videoSerie in

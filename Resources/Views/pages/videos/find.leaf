@@ -1,0 +1,89 @@
+#extend("base/fullscreen"):
+    #export("title", "Dashboard")
+    #export("bodyClass", "")
+    #export("body"):
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Videos</li>
+                <li class="breadcrumb-item">Find</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <h2>Find videos</h2>
+            </div>
+            <div class="col-lg-6 col-md-12 text-right">
+            </div>
+        </div>
+
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-6">
+                <form method="POST" action="?addToVideoSerieID=#(context.flags.addToVideoSerieID)&addToStageID=#(context.flags.addToStageID)">
+                  <div class="form-group">
+                    <label for="query">Search Query</label>
+                    <input type="text" class="form-control" id="query" name="query" required="" aria-describedby="query-help" value="#(context.form.query)">
+                    <br>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Find</button>
+                </form>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Thumbnail</th>
+                        <th>Title</th>
+                        <th>Published At</th>
+                        <th>Youtube Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #for(video in context.videos):
+                    <tr>
+                        <td>
+                            #(video.id)
+                        </td>
+                        <td style="width: 200px;">
+                            <img src="#(video.thumbnailURL)" class="rounded img-fluid">
+                        </td>
+                        <td>
+                            #(video.title)
+                        </td>
+                        <td>
+                            #(video.publishedAt)
+                        </td>
+                        <td>
+                            <a href="https://youtube.com/watch?v=#(video.videoID)">https://youtube.com/watch?v=#(video.videoID)</a>
+                        </td>
+                        <td>
+                            #if(context.addTo.stage):
+                            <div class="card" style="width: 18rem;">
+                              <div class="card-body">
+                                <h5 class="card-title">#(context.model.name) - #(context.stage.name)</h5>
+                                <a href="/models/#(context.model.id)/stages/#(context.stage.id)/add-video?videoID=#(video.videoID)" class="btn btn-success">Add to Stage</a>
+                              </div>
+                            </div>
+                            #endif
+                            #if(context.addTo.videoSerie):
+                            <div class="card" style="width: 18rem;">
+                              <div class="card-body">
+                                <h5 class="card-title">#(context.videoSerie.title)</h5>
+                                <a href="/videoSeries/#(context.videoSerie.id)/add-video?videoID=#(video.videoID)" class="btn btn-success">Add to Video Serie</a>
+                              </div>
+                            </div>
+                            #endif
+                        </td>
+                    </tr>
+                    #endfor
+                </tbody>
+            </table>
+        </div>
+    #endexport
+#endextend

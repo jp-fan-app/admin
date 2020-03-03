@@ -1,7 +1,0 @@
-#extend("base/fullscreen"):
-    #export("title", "Dashboard")
-    #export("bodyClass", "")
-    #export("body"):
-        <div>Videos</div>
-    #endexport
-#endextend

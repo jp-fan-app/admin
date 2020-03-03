@@ -88,7 +88,10 @@ func routes(_ app: Application) throws {
         router.get("models", ":id", "stages", ":stageID", "videos", ":videoID", "publish", use: modelController.publishVideo)
         router.post("models", ":id", "stages", ":stageID", "videos", ":videoID", "publish", use: modelController.publishVideoPOST)
 
-        router.get("videos", use: { try defaultController.view($0, view: "pages/videos", page: .videos) })
+        let videoController = VideoController()
+        router.get("videos", use: videoController.index)
+        router.get("videos", "find", use: videoController.find)
+        router.post("videos", "find", use: videoController.findPOST)
 
         let videoSeriesController = VideoSeriesController()
         router.get("videoSeries", use: videoSeriesController.index)

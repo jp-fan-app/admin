@@ -1056,7 +1056,13 @@ final class ModelController {
 
     }
 
-    struct AddVideoForm: Codable {
+    struct AddVideoForm: Content {
+
+        let videoID: String
+
+    }
+
+    struct AddVideoFlags: Content {
 
         let videoID: String
 
@@ -1069,6 +1075,12 @@ final class ModelController {
         guard let stageID = req.parameters.get("stageID", as: Int.self) else {
             return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
         }
+
+        if let flags = try? req.query.decode(AddVideoFlags.self) {
+            try req.content.encode(AddVideoForm(videoID: flags.videoID))
+            return try addVideoPOST(req)
+        }
+
 
         return req.client().modelsShow(id: id).flatMap { model in
             return req.client().stagesShow(id: stageID).flatMap { stage in
