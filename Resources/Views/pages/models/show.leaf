@@ -232,6 +232,7 @@
                                         <a href="/models/#(context.model.id)/images/#(image.id)/upload" class="btn btn-success">Upload</a>
                                         #endif
                                         #if(isAdmin):
+                                        <a href="/models/#(context.model.id)/images/#(image.id)/set-main-image" class="btn btn-success">Main Image</a>
                                         <a href="/models/#(context.model.id)/images/#(image.id)/edit" class="btn btn-primary">Edit</a>
                                         <a href="/models/#(context.model.id)/images/#(image.id)/delete" class="btn btn-danger">Delete</a>
                                         #endif

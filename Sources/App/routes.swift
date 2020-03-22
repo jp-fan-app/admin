@@ -60,6 +60,8 @@ func routes(_ app: Application) throws {
         admin.post("models", ":id", "images", ":imageID", "delete", use: modelController.deleteImagePOST)
         admin.get("models", ":id", "images", ":imageID", "publish", use: modelController.publishImage)
         admin.post("models", ":id", "images", ":imageID", "publish", use: modelController.publishImagePOST)
+        admin.get("models", ":id", "images", ":imageID", "set-main-image", use: modelController.setMainImage)
+        admin.post("models", ":id", "images", ":imageID", "set-main-image", use: modelController.setMainImagePOST)
         // Stages
         router.get("models", ":id", "add-stage", use: modelController.addStage)
         router.post("models", ":id", "add-stage", use: modelController.addStagePOST)

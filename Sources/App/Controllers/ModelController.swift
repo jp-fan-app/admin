@@ -494,6 +494,53 @@ final class ModelController {
             return req.redirect(to: "/models/\(id)")
         }
     }
+    
+    // MARK: - Publish Image
+
+    struct ModelSetMainImageContext: Codable {
+
+        let model: JPFanAppClient.CarModel
+        let image: JPFanAppClient.CarImage
+
+    }
+
+    func setMainImage(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().imagesShow(id: imageID).flatMap { carImage in
+                let context = DefaultContext(.manufacturers,
+                                             ModelSetMainImageContext(model: model, image: carImage),
+                                             isAdmin: req.isAdmin(),
+                                             username: req.username())
+                return req.view.render("pages/models/images/set-main-image", context).encodeResponse(for: req)
+            }
+        }
+    }
+
+    func setMainImagePOST(_ req: Request) throws -> EventLoopFuture<Response> {
+        guard let id = req.parameters.get("id", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+        guard let imageID = req.parameters.get("imageID", as: Int.self) else {
+            return req.eventLoop.future(req.redirect(to: "/models"))
+        }
+
+        return req.client().modelsShow(id: id).flatMap { model in
+            return req.client().imagesShow(id: imageID).flatMap { carImage in
+                var patchModel = model
+                patchModel.mainImageID = imageID
+                return req.client().modelsPatch(id: id, model: patchModel).map { _ in
+                    return req.redirect(to: "/models/\(id)")
+                }
+            }
+        }
+    }
 
     // MARK: - Add Stage
 
