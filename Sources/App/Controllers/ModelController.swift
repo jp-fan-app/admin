@@ -9,6 +9,7 @@
 import Foundation
 import Vapor
 import JPFanAppClient
+import SwiftGD
 
 
 final class ModelController {
@@ -323,7 +324,18 @@ final class ModelController {
         }
 
         var form = try req.content.decode(AddImageForm.self)
-        guard form.file.contentType == .some(.jpeg) else {
+        guard let contentType = form.file.contentType else {
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/add-image"))
+        }
+        let data: Data
+        switch contentType {
+        case .jpeg:
+            data = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
+        case .png:
+            let pngData = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
+            let image = try Image(data: pngData, as: .png)
+            data = try image.export(as: .jpg(quality: 95))
+        default:
             return req.eventLoop.future(req.redirect(to: "/models/\(id)/add-image"))
         }
 
@@ -332,7 +344,6 @@ final class ModelController {
             guard let imageID = carImage.id else {
                 return req.eventLoop.future(req.redirect(to: "/models/\(id)/add-image"))
             }
-            let data = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
             return req.client().imagesUpload(id: imageID, imageData: data).flatMap { _ in
                 return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
             }
@@ -382,11 +393,21 @@ final class ModelController {
         }
 
         var form = try req.content.decode(UploadImageForm.self)
-        guard form.file.contentType == .some(.jpeg) else {
+        guard let contentType = form.file.contentType else {
             return req.eventLoop.future(req.redirect(to: "/models/\(id)/images/\(imageID)/upload-image"))
         }
-
-        let data = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
+        let data: Data
+        switch contentType {
+        case .jpeg:
+            data = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
+        case .png:
+            let pngData = form.file.data.readData(length: form.file.data.readableBytes) ?? Data()
+            let image = try Image(data: pngData, as: .png)
+            data = try image.export(as: .jpg(quality: 95))
+        default:
+            return req.eventLoop.future(req.redirect(to: "/models/\(id)/images/\(imageID)/upload-image"))
+        }
+        
         return req.client().imagesUpload(id: imageID, imageData: data).flatMap { _ in
             return req.eventLoop.future(req.redirect(to: "/models/\(id)"))
         }

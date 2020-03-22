@@ -4,6 +4,10 @@
 FROM vapor/swift:5.1 as build
 WORKDIR /build
 
+RUN apt-get -qq update && apt-get -q -y install \
+  libgd-dev \
+  && rm -r /var/lib/apt/lists/*
+
 # Copy entire repo into container
 COPY . .
 
